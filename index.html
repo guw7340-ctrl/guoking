@@ -929,18 +929,18 @@ window.addEventListener('load', async () => {
   checkMarket();
   updateNotifyChannelUI();
 
-  // ★ 優先載入
-  ldMsg('載入自選股...', 70);
+  ldMsg('載入核心數據...', 80);
+  const tasks = [];
   if (S.pref.watch !== false) {
-    await loadWatchlist();
+    tasks.push(loadWatchlist());
   } else {
     document.getElementById('watchContainer').innerHTML =
       '<div class="no-data">點擊下方 ⭐ 切換到自選股即可載入</div>';
   }
+  tasks.push(loadIndex());
+  tasks.push(loadMarket());
 
-  ldMsg('預載市場資訊...', 90);
-  loadIndex();
-  loadMarket();
+  await Promise.all(tasks);
 
   ldMsg('完成', 100);
   // 隱藏 loading
@@ -1026,8 +1026,11 @@ async function loadWatchlist() {
   if (r?.ok && r.prices?.length) {
     r.prices.forEach(p => {
       S.priceCache[p.code] = p;
-      if (p.name) { S.nameCache[p.code]=p.name; localStorage.setItem('rdNames',JSON.stringify(S.nameCache)); }
+      if (p.name && p.name !== p.code) { 
+        S.nameCache[p.code]=p.name; 
+      }
     });
+    localStorage.setItem('rdNames',JSON.stringify(S.nameCache));
     renderWatchlist(r.prices);
     if (r.isWeekend) toast('📅 週末顯示週五收盤資料');
   } else {
@@ -1413,7 +1416,11 @@ async function loadMarket() {
   document.getElementById('mktList').innerHTML='<div class="loading-row"><div class="spin"></div><br>載入中...</div>';
   const r=await gas('getPrices',{codes});
   if (r?.ok&&r.prices?.length) {
-    r.prices.forEach(p=>{S.priceCache[p.code]=p;if(p.name)S.nameCache[p.code]=p.name;});
+    r.prices.forEach(p=>{
+      S.priceCache[p.code]=p;
+      if(p.name && p.name !== p.code) S.nameCache[p.code]=p.name;
+    });
+    localStorage.setItem('rdNames',JSON.stringify(S.nameCache));
     renderMktList(r.prices);
   } else {
     document.getElementById('mktList').innerHTML='<div class="err-banner">無法取得資料</div>';
@@ -1531,8 +1538,9 @@ async function runScan() {
   const results=[];
   if(r?.ok&&r?.data?.data?.length) {
     r.data.data.slice(0,8).forEach(row=>{
-      const net=parseFloat(String(row[4]||'0').replace(/,/g,''))||0;
-      if(row[1]) results.push({name:row[1],detail:'法人淨'+(net>=0?'買':'賣')+'超 '+row[4]+'億',score:Math.min(99,40+Math.abs(net)/500|0),type:net>=0?'buy':'sell',time:'盤後'});
+      const net=parseFloat(String(row[3]||'0').replace(/,/g,''))||0;
+      const netBill = (net/100000000).toFixed(2);
+      if(row[0]) results.push({name:row[0],detail:'法人淨'+(net>=0?'買':'賣')+'超 '+netBill+'億',score:Math.min(99,40+Math.abs(netBill)*2|0),type:net>=0?'buy':'sell',time:'盤後'});
     });
   }
   if(!results.length) results.push({name:'資料尚未更新',detail:'TWSE 盤後約16:00更新',score:0,type:'neu',time:'--'});
@@ -1551,8 +1559,9 @@ async function loadScanByMode(mode) {
     if(mode==='主力異動'){
       const r=await gas('getInstitutional',{});
       if(r?.ok&&r?.data?.data?.length) r.data.data.slice(0,6).forEach(row=>{
-        const net=parseFloat(String(row[4]||'0').replace(/,/g,''))||0;
-        if(row[1])results.push({name:row[1],detail:'淨買超 '+row[4]+'億',score:Math.min(99,40+Math.abs(net)/500|0),type:net>=0?'buy':'sell',time:'盤後'});
+        const net=parseFloat(String(row[3]||'0').replace(/,/g,''))||0;
+        const netBill = (net/100000000).toFixed(2);
+        if(row[0])results.push({name:row[0],detail:'淨買超 '+netBill+'億',score:Math.min(99,40+Math.abs(netBill)*2|0),type:net>=0?'buy':'sell',time:'盤後'});
       });
     } else if(mode==='融券攻擊'){
       const r=await gas('getMarginShort',{});
