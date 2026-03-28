@@ -536,16 +536,7 @@ body::before{content:'';position:fixed;inset:0;
           <div style="font-size:16px;font-weight:700;margin-bottom:5px">加入當沖圍中紅龍</div>
           <div style="font-size:12px;color:var(--t2);margin-bottom:20px">使用LINE帳號登入，啟用即時股價通知</div>
         </div>
-        <!-- LIFF 設定說明 -->
-        <div class="err-banner" id="liffGuide">
-          <div style="font-weight:700;margin-bottom:6px">⚙️ 部署說明（開發者請看）</div>
-          <div style="line-height:1.8">
-            1. 至 LINE Developers → 建立 LIFF App<br>
-            2. 端點網址填入：<b>GAS 部署網址</b><br>
-            3. LIFF ID 填入下方 CONFIG.LIFF_ID<br>
-            4. GAS URL 填入 CONFIG.GAS_URL
-          </div>
-        </div>
+        
         <button class="btn-line" onclick="doLogin()">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
           使用 LINE 登入
@@ -673,8 +664,8 @@ body::before{content:'';position:fixed;inset:0;
 //  ★ CONFIG — 請修改這兩個值
 // ═══════════════════════════════════════════
 const CONFIG = {
-  LIFF_ID:  '2009624678-jXtdZr3P',           // LINE Developers → LIFF App → LIFF ID
-  GAS_URL:  'https://script.google.com/macros/library/d/1419HkXWRfccxvJMB04foLc41OIgxPgbQ-wUC9wwp4O96ohQ0_nXLUjCN/2',   // GAS 部署 → 網頁應用程式 URL
+  LIFF_ID:  '2009624678-jXtdZr3P',
+  GAS_URL:  'https://script.google.com/macros/s/AKfycbwMmwtiqanCJZB7-S_v73DhYyEQyV5e4HQof7nL1WPcTeSQ3SzlDB0Fojbf_QMqb2tY/exec',
   ADMIN_PHONE: '0937942582',
 };
 
@@ -702,9 +693,7 @@ const S = {
 window.addEventListener('load', async () => {
   ldMsg('初始化 LIFF...');
   // 隱藏 LIFF guide if configured
-  if (CONFIG.LIFF_ID !== 'YOUR_LIFF_ID') {
-    document.getElementById('liffGuide').style.display = 'none';
-  }
+  
 
   // Load local state
   S.watchlist = JSON.parse(localStorage.getItem('rdWatch') || '["2330","2454","0050","2317","2308"]');
@@ -712,13 +701,11 @@ window.addEventListener('load', async () => {
 
   // Init LIFF
   try {
-    if (CONFIG.LIFF_ID !== 'YOUR_LIFF_ID') {
-      await liff.init({ liffId: CONFIG.LIFF_ID });
-      if (liff.isLoggedIn()) {
-        ldMsg('取得 LINE 用戶資料...');
-        const profile = await liff.getProfile();
-        await processLogin(profile);
-      }
+    await liff.init({ liffId: CONFIG.LIFF_ID });
+    if (liff.isLoggedIn()) {
+      ldMsg('取得 LINE 用戶資料...');
+      const profile = await liff.getProfile();
+      await processLogin(profile);
     }
   } catch(e) {
     console.warn('LIFF init failed:', e.message);
@@ -772,10 +759,6 @@ async function autoRefresh() {
 //  GAS API
 // ═══════════════════════════════════════════
 async function gas(action, data = {}) {
-  if (CONFIG.GAS_URL === 'YOUR_GAS_WEB_APP_URL') {
-    console.warn('GAS_URL 未設定');
-    return null;
-  }
   try {
     const res = await fetch(CONFIG.GAS_URL + '?action=' + action, {
       method: 'POST',
@@ -1317,7 +1300,7 @@ function renderBigDayTrade(r, c) {
       <div class="drow"><span class="dl">當沖交易比例</span><div class="dv up">TWSE 盤後公布</div></div>
       <div class="drow"><span class="dl">當沖買賣金額</span><div class="dv">見 TWSE 官網</div></div>
       <div class="drow"><span class="dl">當沖熱門股</span><div class="dv neu">成交量前段班</div></div>
-      <div style="margin-top:10px;font-size:11px;color:var(--t3)"> 
+      <div style="margin-top:10px;font-size:11px;color:var(--t3)">
         當沖相關資料於每日盤後14:30-16:00於 TWSE 官網公布。<br>
         本系統透過 GAS 代理自動取得並更新。
       </div>
@@ -1328,10 +1311,6 @@ function renderBigDayTrade(r, c) {
 //  LINE LOGIN
 // ═══════════════════════════════════════════
 async function doLogin() {
-  if (CONFIG.LIFF_ID === 'YOUR_LIFF_ID') {
-    toast('⚠️ 請先設定 LIFF_ID');
-    return;
-  }
   try {
     if (!liff.isLoggedIn()) {
       liff.login({ redirectUri: window.location.href });
@@ -1391,7 +1370,7 @@ function doLogout() {
   document.getElementById('memOut').style.display = 'block';
   document.getElementById('adminPanel').style.display = 'none';
   document.getElementById('avWrap').style.display = 'none';
-  if (CONFIG.LIFF_ID !== 'YOUR_LIFF_ID' && typeof liff !== 'undefined') {
+  if (typeof liff !== 'undefined') {
     try { liff.logout(); } catch(e) {}
   }
   toast('已登出');
