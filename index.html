@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>當沖圍中紅龍</title>
+<title>當沖圍中紅龍 VER1.0</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap');
@@ -353,7 +353,7 @@ body::before{content:'';position:fixed;inset:0;
 <div id="loading">
   <div class="ld-logo">龍</div>
   <div style="font-size:20px;font-weight:900">當沖圍中紅龍</div>
-  <div class="ld-sub">DAYTRADING SYSTEM v2.0</div>
+  <div class="ld-sub">VER1.0 · DAYTRADING SYSTEM</div>
   <div class="ld-bar"><div class="ld-fill"></div></div>
   <div class="ld-msg" id="ldMsg">連線 TWSE 即時資料...</div>
 </div>
@@ -365,7 +365,7 @@ body::before{content:'';position:fixed;inset:0;
   <div id="hdr">
     <div class="logo">
       <div class="logo-box">龍</div>
-      <div class="logo-txt">RED DRAGON</div>
+      <div class="logo-txt">RED DRAGON <span style="font-size:9px;opacity:.7">VER1.0</span></div>
     </div>
     <div class="hdr-r">
       <div id="mktBadge" class="mkt-badge mkt-close">休市</div>
@@ -756,18 +756,36 @@ async function autoRefresh() {
 }
 
 // ═══════════════════════════════════════════
-//  GAS API
+//  GAS API — 改善錯誤處理與 CORS 相容
 // ═══════════════════════════════════════════
 async function gas(action, data = {}) {
   try {
-    const res = await fetch(CONFIG.GAS_URL + '?action=' + action, {
-      method: 'POST',
-      body: JSON.stringify({ action, ...data }),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    return await res.json();
+    // 用 GET 方式避免 CORS preflight 問題（GAS 不支援 OPTIONS）
+    const params = new URLSearchParams({ action, ...Object.fromEntries(
+      Object.entries(data).map(([k,v]) => [k, typeof v === 'object' ? JSON.stringify(v) : v])
+    )}).toString();
+    // 先試 POST（帶完整資料），失敗才改 GET
+    let res, json;
+    try {
+      res = await fetch(CONFIG.GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action, ...data }),
+        headers: { 'Content-Type': 'text/plain' }, // 避免 CORS preflight
+      });
+      const text = await res.text();
+      json = JSON.parse(text);
+    } catch(postErr) {
+      // Fallback: GET
+      res  = await fetch(CONFIG.GAS_URL + '?' + params);
+      const text = await res.text();
+      json = JSON.parse(text);
+    }
+    if (!json) return null;
+    // 記錄 GAS 錯誤到 console（方便 debug）
+    if (!json.ok) console.warn('[GAS]', action, json.error || json);
+    return json;
   } catch(e) {
-    console.error('GAS error:', e.message);
+    console.error('[GAS ERROR]', action, e.message);
     return null;
   }
 }
@@ -785,26 +803,36 @@ async function loadIndex() {
 }
 
 function renderIndex(r) {
-  // Try parse TWSE index response
-  // MI_5MINS_INDEX format
-  const idx = r?.index;
-  if (idx?.data?.length) {
-    const last = idx.data[idx.data.length - 1];
-    const val = parseFloat(last[1]?.replace(/,/g,''));
-    const prev = S.indexData?.prevClose || 0;
-    document.getElementById('idxVal').textContent = val ? val.toLocaleString() : '--';
-    document.getElementById('idxChg').textContent = prev ? formatChg(val - prev) : '';
-  }
-  // MI_INDEX afterTrading
-  const ai = r?.afterIndex;
-  if (ai?.data) {
-    const ms = ai.data.find(d => d[0] === '加權指數' || d[0] === '發行量加權股價指數');
-    if (ms) {
-      const val = ms[4]?.replace(/,/g,'') || ms[2]?.replace(/,/g,'');
-      document.getElementById('idxVal').textContent = parseFloat(val).toLocaleString() || '--';
-      const upCnt = ai.data.filter(d=>parseFloat(d[4])>0).length;
-      document.getElementById('idxUp').textContent = ai.fields?.length ? '--' : upCnt;
+  if (!r?.ok) return;
+  // TWSE exchangeReport/MI_INDEX (type=MS) 回傳格式：
+  // stat:'OK', data:[['發行量加權股價指數','22847.00','▲123.45','▲0.54%',...]]
+  const taiex = r?.taiex;
+  if (taiex?.stat === 'OK' && taiex?.data?.length) {
+    const row    = taiex.data.find(d => (d[0]||'').includes('加權')) || taiex.data[0];
+    if (row) {
+      const val    = parseFloat(String(row[1]||'0').replace(/,/g,''));
+      const chgStr = String(row[2] || '');
+      const chgVal = parseFloat(chgStr.replace(/[▲▼+\-,\s]/g,'')) || 0;
+      const isUp   = chgStr.includes('▲') || chgStr.startsWith('+');
+      const pctStr = String(row[3]||'');
+      const pct    = parseFloat(pctStr.replace(/[▲▼+\-,%\s]/g,'')) || 0;
+      if (!isNaN(val) && val > 0) {
+        document.getElementById('idxVal').textContent = val.toLocaleString();
+        document.getElementById('idxChg').textContent = (isUp?'▲ +':'▼ ') + Math.abs(chgVal).toFixed(2) + ' (' + Math.abs(pct).toFixed(2) + '%)';
+        document.getElementById('idxChg').className   = 'idx-chg ' + (isUp ? 'up' : 'dn');
+      }
     }
+  }
+  // 上漲/下跌家數
+  const cats = r?.categories;
+  if (cats?.stat === 'OK' && cats?.data?.length) {
+    let up = 0, dn = 0;
+    cats.data.forEach(row => {
+      const c2 = String(row[2]||'');
+      if (c2.includes('▲') || parseFloat(c2)>0) up++; else if(c2.includes('▼') || parseFloat(c2)<0) dn++;
+    });
+    if (up) document.getElementById('idxUp').textContent = up;
+    if (dn) document.getElementById('idxDn').textContent = dn;
   }
 }
 
@@ -816,15 +844,22 @@ async function loadWatchlist() {
   if (S.watchlist.length === 0) {
     c.innerHTML = '<div class="no-data">尚無自選股，點擊＋新增</div>'; return;
   }
-  c.innerHTML = '<div class="no-data"><div class="spin"></div><br>取得即時報價...</div>';
-  const r = await gas('getPrices', { codes: S.watchlist });
-  if (r?.ok && r.prices?.length) {
-    r.prices.forEach(p => { if(p.code) S.priceCache[p.code] = p; });
-    renderWatchlist(r.prices);
-  } else {
-    // Fallback: show codes without price
+  c.innerHTML = '<div class="no-data"><div class="spin"></div><br>取得 TWSE 即時報價...</div>';
+  try {
+    const r = await gas('getPrices', { codes: S.watchlist });
+    if (r?.ok && r.prices?.length) {
+      r.prices.forEach(p => { if(p.code) S.priceCache[p.code] = p; });
+      renderWatchlist(r.prices);
+      if (r.failed?.length) toast(`⚠️ 部分代號查無資料：${r.failed.join(',')}`);
+    } else {
+      // 顯示代號但無報價
+      renderWatchlist(S.watchlist.map(code => ({ code, name: code, price: 0, change: 0, pct: 0, ok: false })));
+      const errMsg = r?.error || '無法取得 TWSE 資料';
+      c.insertAdjacentHTML('afterbegin', `<div class="err-banner">⚠️ ${errMsg}<br><small>請確認 GAS 已重新部署（新版本）</small></div>`);
+    }
+  } catch(e) {
     renderWatchlist(S.watchlist.map(code => ({ code, name: code, price: 0, change: 0, pct: 0, ok: false })));
-    toast('⚠️ 無法取得即時報價，請確認 GAS 部署設定');
+    toast('⚠️ 連線失敗：' + e.message);
   }
 }
 
