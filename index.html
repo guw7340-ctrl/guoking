@@ -20,7 +20,7 @@
   --mono:'Share Tech Mono',monospace;--font:'Noto Sans TC',sans-serif;
   --r:12px;--rs:8px;--safe:env(safe-area-inset-bottom,0px);
   --fz: 16px;
-  --fz-scale: 1;
+  --fz-scale: 1.1;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--t1);font-family:var(--font);font-size:calc(var(--fz) * var(--fz-scale))}
@@ -372,7 +372,10 @@ canvas#klineChart{width:100%!important;height:100%!important}
   <div class="ld-sub">v1.2 · DAYTRADING SYSTEM</div>
   <div style="background:var(--rg);border:1px solid var(--bdrr);border-radius:6px;padding:4px 12px;font-size:10px;color:var(--red);font-weight:700">🎁 免費試用中</div>
   <div class="ld-bar"><div class="ld-fill"></div></div>
-  <div id="ldMsg" style="font-size:11px;color:var(--t3)">初始化中...</div>
+  <div style="display:flex;justify-content:space-between;width:200px;margin-top:-5px">
+    <div id="ldMsg" style="font-size:11px;color:var(--t3)">初始化中...</div>
+    <div id="ldPct" style="font-size:11px;color:var(--t3);font-family:var(--mono)">0%</div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -677,6 +680,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
         <div class="kline-tab on" onclick="setKlineType(this,'candle')">K線</div>
         <div class="kline-tab" onclick="setKlineType(this,'line')">折線</div>
         <div class="kline-tab" onclick="setKlineType(this,'vol')">量能</div>
+        <div class="kline-tab" onclick="setKlineType(this,'macd')">MACD</div>
       </div>
       <div class="kline-canvas-wrap">
         <canvas id="klineChart"></canvas>
@@ -695,6 +699,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
       <div class="tab" onclick="setCoreTab(this,'融資融券')">融資融券</div>
       <div class="tab" onclick="setCoreTab(this,'當沖資訊')">當沖資訊</div>
       <div class="tab" onclick="setCoreTab(this,'關鍵分點')">關鍵分點</div>
+      <div class="tab" onclick="setCoreTab(this,'未來趨勢')">未來趨勢</div>
     </div>
     <div id="coreContent"><div class="loading-row"><div class="spin"></div></div></div>
   </div>
@@ -789,7 +794,7 @@ const C = {
   LIFF_ID:     '2009624678-jXtdZr3P',
   GAS_URL:     'https://script.google.com/macros/s/AKfycbwMmwtiqanCJZB7-S_v73DhYyEQyV5e4HQof7nL1WPcTeSQ3SzlDB0Fojbf_QMqb2tY/exec',
   ADMIN_ID:    'U17769ba957e37cc8e63105a37b7388c5',
-  VERSION:     'VER1.1',
+  VERSION:     'v1.2',
 };
 
 // ═══════════════════════════════════
@@ -946,8 +951,10 @@ window.addEventListener('load', async () => {
   // 隱藏 loading
   setTimeout(() => {
     const ld = document.getElementById('loading');
-    ld.style.opacity = '0';
-    setTimeout(() => ld.style.display='none', 400);
+    if (ld) {
+      ld.style.opacity = '0';
+      setTimeout(() => ld.style.display='none', 400);
+    }
     renderNotifyList();
     renderFeatGrid();
   }, 300);
@@ -964,7 +971,9 @@ window.addEventListener('load', async () => {
 
 function ldMsg(m, pct) {
   const el = document.getElementById('ldMsg');
+  const pctEl = document.getElementById('ldPct');
   if (el) el.textContent = m;
+  if (pctEl && pct !== undefined) pctEl.textContent = pct + '%';
   const fill = document.querySelector('.ld-fill');
   if (fill && pct !== undefined) fill.style.width = pct + '%';
 }
@@ -1209,6 +1218,44 @@ function drawKline(code, name, priceObj) {
           tension:.3}]},
       options:klineOpts(data,'分鐘折線'),
     });
+  } else if (S.klineType==='macd') {
+    // MACD 指標
+    const macdData = calcMACD(data);
+    S.klineChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(d => d.t),
+        datasets: [
+          {
+            label: 'MACD',
+            data: macdData.macd,
+            borderColor: '#00b4ff',
+            borderWidth: 1.5,
+            type: 'line',
+            pointRadius: 0,
+            fill: false,
+            order: 2
+          },
+          {
+            label: 'Signal',
+            data: macdData.signal,
+            borderColor: '#ffd700',
+            borderWidth: 1.5,
+            type: 'line',
+            pointRadius: 0,
+            fill: false,
+            order: 3
+          },
+          {
+            label: 'Hist',
+            data: macdData.hist,
+            backgroundColor: macdData.hist.map(v => v >= 0 ? 'rgba(255,34,51,.7)' : 'rgba(0,230,118,.7)'),
+            order: 1
+          }
+        ]
+      },
+      options: klineOpts(data, 'MACD'),
+    });
   } else {
     // 量能圖
     S.klineChart = new Chart(ctx,{
@@ -1219,6 +1266,27 @@ function drawKline(code, name, priceObj) {
       options:klineOpts(data,'成交量'),
     });
   }
+}
+
+function calcEMA(data, period) {
+  const k = 2 / (period + 1);
+  let ema = data[0];
+  const res = [ema];
+  for (let i = 1; i < data.length; i++) {
+    ema = (data[i] * k) + (ema * (1 - k));
+    res.push(ema);
+  }
+  return res;
+}
+
+function calcMACD(data) {
+  const closes = data.map(d => d.close);
+  const ema12 = calcEMA(closes, 12);
+  const ema26 = calcEMA(closes, 26);
+  const macd = ema12.map((v, i) => v - ema26[i]);
+  const signal = calcEMA(macd, 9);
+  const hist = macd.map((v, i) => v - signal[i]);
+  return { macd, signal, hist };
 }
 
 function klineOpts(data, label) {
@@ -1301,7 +1369,43 @@ async function loadCoreData(tab) {
     else if (tab==='融資融券') { r=await gas('getMarginShort',{code}); renderMarginShort(r); }
     else if (tab==='當沖資訊') { r=await gas('getDayTrade',{code}); renderDayTradeInfo(r); }
     else if (tab==='關鍵分點') { r=await gas('getTopBuySell',{code}); renderTopBuySell(r); }
+    else if (tab==='未來趨勢') { loadFutureTrend(); }
   } catch(e) { c.innerHTML=`<div class="err-banner">載入失敗：${e.message}</div>`; }
+}
+
+async function loadFutureTrend() {
+  const c = document.getElementById('coreContent');
+  const code = S.currentStock?.code;
+  c.innerHTML = '<div class="loading-row"><div class="spin"></div><br>AI 分析中...</div>';
+  const r = await gas('getFutureTrend', { code });
+  if (r?.ok) {
+    renderFutureTrend(r);
+  } else {
+    c.innerHTML = `<div class="err-banner">分析失敗：${r?.error || '未知錯誤'}</div>`;
+  }
+}
+
+function renderFutureTrend(r) {
+  const c = document.getElementById('coreContent');
+  const color = r.trend === '上漲' ? 'var(--red)' : (r.trend === '下跌' ? 'var(--grn)' : 'var(--t2)');
+  c.innerHTML = `
+    <div class="card">
+      <div style="text-align:center;padding:10px 0">
+        <div style="font-size:12px;color:var(--t3)">預測趨勢</div>
+        <div style="font-size:32px;font-weight:900;color:${color}">${r.trend}</div>
+        <div style="font-size:11px;color:var(--t2)">信心指數：${r.confidence}%</div>
+      </div>
+      <div class="sec">分析依據</div>
+      <div style="padding:5px 0">
+        ${r.reasons.map(reason => `<div style="font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:6px"><span style="color:var(--red)">•</span>${reason}</div>`).join('')}
+      </div>
+      <div class="sec">操作建議</div>
+      <div style="background:var(--bg3);padding:10px;border-radius:8px;font-size:13px;font-weight:700;color:var(--t1);text-align:center">
+        ${r.advice}
+      </div>
+      <div style="font-size:9px;color:var(--t3);margin-top:12px;text-align:right">AI 預測僅供參考，投資請審慎評估</div>
+    </div>
+  `;
 }
 
 function renderInstitutional(r, tab) {
@@ -1733,14 +1837,22 @@ function setLoggedIn(u) {
   if(!u.phone) document.getElementById('phoneCard').style.display='block';
   const pt=document.getElementById('memPlan');
   const planMap={free:'免費試用',monthly:'月費會員',yearly:'年費會員'};
-  pt.textContent=S.isAdmin?'系統管理員':(planMap[u.plan]||'免費試用');
+  pt.textContent=S.isAdmin?'超級權限':(planMap[u.plan]||'免費試用');
   pt.className='plan-tag '+(S.isAdmin?'pt-admin':u.plan==='yearly'?'pt-yearly':u.plan==='monthly'?'pt-monthly':'pt-free');
   if(u.tgId) document.getElementById('tgInput').value=u.tgId;
-  if(S.isAdmin){document.getElementById('adminPanel').style.display='block';loadAdminData();}
+  if(S.isAdmin){
+    document.getElementById('adminPanel').style.display='block';
+    loadAdminData();
+    const tb = document.getElementById('trialBadge');
+    if (tb) {
+      tb.textContent = '💎 超級權限';
+      tb.style.display = 'block';
+    }
+  }
   updateNotifyChannelUI();
   renderFeatGrid();
-  // 隱藏試用徽章若已付費
-  if(u.plan!=='free') document.getElementById('trialBadge').style.display='none';
+  // 隱藏試用徽章若已付費且非管理員
+  if(u.plan!=='free' && !S.isAdmin) document.getElementById('trialBadge').style.display='none';
 }
 
 function doLogout() {
