@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>當沖圍中紅龍 v1.3</title>
+<title>當沖圍中紅龍 v1.4</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -369,7 +369,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
 <div id="loading">
   <div class="ld-logo">龍</div>
   <div style="font-size:18px;font-weight:900">當沖圍中紅龍</div>
-  <div class="ld-sub">v1.3 · DAYTRADING SYSTEM</div>
+  <div class="ld-sub">v1.4 · DAYTRADING SYSTEM</div>
   <div style="background:var(--rg);border:1px solid var(--bdrr);border-radius:6px;padding:4px 12px;font-size:10px;color:var(--red);font-weight:700">🎁 免費試用中</div>
   <div class="ld-bar"><div class="ld-fill"></div></div>
   <div style="display:flex;justify-content:space-between;width:200px;margin-top:-5px">
@@ -386,7 +386,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
 <div id="hdr">
   <div class="logo">
     <div class="logo-box">龍</div>
-    <div class="logo-txt">當沖圍中紅龍<span class="ver-tag">v1.3</span></div>
+    <div class="logo-txt">當沖圍中紅龍<span class="ver-tag">v1.4</span></div>
   </div>
   <div class="hdr-r">
     <div id="clock" style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-right:8px;font-weight:700"></div>
@@ -705,7 +705,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
       <div style="display:flex;gap:5px;margin-top:8px;z-index:10;position:relative" id="klineTimeframes">
         <div class="kline-tab on" onclick="setKlineTimeframe(this,'day')">日線</div>
         <div class="kline-tab" onclick="setKlineTimeframe(this,'week')">週線</div>
-        <div class="kline-tab" onclick="setKlineTimeframe(this((,'month')">月線</div>
+        <div class="kline-tab" onclick="setKlineTimeframe(this,'month')">月線</div>
       </div>
       <div class="kline-canvas-wrap">
         <canvas id="klineChart"></canvas>
@@ -838,9 +838,10 @@ const C = {
   LIFF_ID:     '2009624678-jXtdZr3P',
   GAS_URL:     'https://script.google.com/macros/s/AKfycbwMmwtiqanCJZB7-S_v73DhYyEQyV5e4HQof7nL1WPcTeSQ3SzlDB0Fojbf_QMqb2tY/exec',
   ADMIN_ID:    'U17769ba957e37cc8e63105a37b7388c5',
-  VERSION:     'v1.3',
+  VERSION:     'v1.4',
 };
 const UPDATE_LOGS = [
+  { ver: 'v1.4', date: '2026-03-28', content: '1. 修復初始化卡死問題\n2. K線切換功能優化' },
   { ver: 'v1.3', date: '2026-03-28', content: '1. 修復自選股新增/刪除/編輯邏輯\n2. 大盤當沖統計自動抓取前一交易日資料\n3. 新增右上角精準時鐘與 12/24 小時制切換\n4. 管理員後台新增更新紀錄選單' },
   { ver: 'v1.2', date: '2026-03-27', content: '1. K線圖修復與 MACD 指標新增\n2. 市場分類自定義功能\n3. 管理員永久超級權限\n4. 券商分點銀行資訊加強' },
   { ver: 'v1.1', date: '2026-03-25', content: '1. 介面美化與效能優化\n2. 週末抓取週五收盤價功能\n3. 修正 TAIEX 指數載入問題' }
@@ -984,92 +985,121 @@ async function refreshWatchlist() {
 //  INIT
 // ═══════════════════════════════════
 window.addEventListener('load', async () => {
-  ldMsg('初始化系統...', 10);
+  console.log('Window Load, starting init...');
+  
+  // 安全機制：6秒後強制進入系統，防止任何非同步任務卡死
+  const forceTimer = setTimeout(() => {
+    console.warn('Init taking too long, forcing entry...');
+    hideLoading();
+  }, 6000);
 
-  // 偏好設定
-  S.pref = JSON.parse(localStorage.getItem('rdPref') || '{"watch":true,"market":false,"scan":false,"big":false}');
-  S.watchlist = JSON.parse(localStorage.getItem('rdWatch') || '["2330","2454","0050","2317","2308"]');
-  S.notifyList = JSON.parse(localStorage.getItem('rdNotify') || '[]');
-  S.nameCache  = JSON.parse(localStorage.getItem('rdNames') || '{}');
-
-  const savedFz = localStorage.getItem('rdFontSize');
-  if (savedFz) {
-    updateFontSize(savedFz);
-    document.getElementById('fontSizeSlider').value = savedFz;
-  }
-
-  // LIFF init
-  ldMsg('連線 LINE LIFF...', 30);
   try {
-    await liff.init({ liffId: C.LIFF_ID });
-    if (liff.isLoggedIn()) {
-      ldMsg('取得 LINE 資料...', 40);
-      const profile = await liff.getProfile();
-      await processLogin(profile);
+    ldMsg('初始化系統...', 10);
+
+    // 偏好設定
+    S.pref = JSON.parse(localStorage.getItem('rdPref') || '{"watch":true,"market":false,"scan":false,"big":false}');
+    S.watchlist = JSON.parse(localStorage.getItem('rdWatch') || '["2330","2454","0050","2317","2308"]');
+    S.notifyList = JSON.parse(localStorage.getItem('rdNotify') || '[]');
+    S.nameCache  = JSON.parse(localStorage.getItem('rdNames') || '{}');
+
+    const savedFz = localStorage.getItem('rdFontSize');
+    if (savedFz) {
+      updateFontSize(savedFz);
+      const fsSlider = document.getElementById('fontSizeSlider');
+      if (fsSlider) fsSlider.value = savedFz;
     }
-  } catch(e) { console.warn('LIFF:', e.message); }
 
-  // 嘗試恢復本機登入
-  const stored = localStorage.getItem('rdUser');
-  if (stored && !S.isLoggedIn) setLoggedIn(JSON.parse(stored));
+    // LIFF init
+    ldMsg('連線 LINE LIFF...', 30);
+    try {
+      // 給 LIFF 3秒超時，防止它卡住整個流程
+      await Promise.race([
+        liff.init({ liffId: C.LIFF_ID }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('LIFF Timeout')), 3000))
+      ]);
+      if (liff.isLoggedIn()) {
+        ldMsg('取得 LINE 資料...', 40);
+        const profile = await liff.getProfile();
+        await processLogin(profile);
+      }
+    } catch(e) { 
+      console.warn('LIFF Init failed or timed out:', e.message); 
+    }
 
-  ldMsg('同步雲端資料...', 50);
-  const r = await gas('login', S.user);
-  if (r?.ok) {
-    S.user = { ...S.user, ...r.user };
-    S.isAdmin = S.user.lineId === C.ADMIN_ID || r.isAdmin;
-  }
+    // 嘗試恢復本機登入
+    const stored = localStorage.getItem('rdUser');
+    if (stored && !S.isLoggedIn) {
+      try {
+        setLoggedIn(JSON.parse(stored));
+      } catch(e) { console.error('Stored user parse failed'); }
+    }
 
-  checkMarket();
-  updateNotifyChannelUI();
-  setTimeFormat(S.timeFormat);
-  setInterval(updateClock, 1000);
-  if (S.isAdmin) renderAdminLogs();
+    ldMsg('同步雲端資料...', 50);
+    try {
+      // 給 GAS Login 3秒超時
+      const r = await Promise.race([
+        gas('login', S.user),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('GAS Timeout')), 3000))
+      ]);
+      if (r?.ok) {
+        S.user = { ...S.user, ...r.user };
+        S.isAdmin = S.user.lineId === C.ADMIN_ID || r.isAdmin;
+      }
+    } catch(e) { 
+      console.warn('GAS Login failed or timed out:', e.message); 
+    }
 
-  ldMsg('載入核心數據...', 80);
-  const tasks = [];
-  if (S.pref.watch !== false) {
-    tasks.push(loadWatchlist());
-  } else {
-    document.getElementById('watchContainer').innerHTML =
-      '<div class="no-data">點擊下方 ⭐ 切換到自選股即可載入</div>';
-  }
-  tasks.push(loadIndex());
-  tasks.push(loadMarket());
+    checkMarket();
+    updateNotifyChannelUI();
+    setTimeFormat(S.timeFormat);
+    setInterval(updateClock, 1000);
+    if (S.isAdmin) {
+      try { renderAdminLogs(); } catch(e) { console.error('Admin logs render failed'); }
+    }
 
-  // 安全機制：5秒後顯示強制進入按鈕，10秒後自動隱藏 loading
-  setTimeout(() => {
-    const btn = document.getElementById('ldForce');
-    if (btn) btn.style.display = 'block';
-  }, 5000);
-  setTimeout(hideLoading, 10000);
+    ldMsg('載入核心數據...', 80);
+    const tasks = [];
+    if (S.pref.watch !== false) {
+      tasks.push(loadWatchlist().catch(e => console.error('Watchlist load failed', e)));
+    } else {
+      const wc = document.getElementById('watchContainer');
+      if (wc) wc.innerHTML = '<div class="no-data">點擊下方 ⭐ 切換到自選股即可載入</div>';
+    }
+    tasks.push(loadIndex().catch(e => console.error('Index load failed', e)));
+    tasks.push(loadMarket().catch(e => console.error('Market load failed', e)));
 
-  try {
     await Promise.all(tasks);
+    ldMsg('完成', 100);
   } catch(e) {
-    console.error('Init tasks failed:', e);
+    console.error('Critical Init Error:', e);
+  } finally {
+    clearTimeout(forceTimer);
+    hideLoading();
+    
+    // 其餘延遲載入
+    setTimeout(() => {
+      if (S.pref.scan) loadScanByMode('主力異動');
+      if (S.pref.big)  loadBigTab('台灣指數');
+    }, 500);
+
+    // 自動刷新（開市中每30秒）
+    setInterval(autoRefresh, 30000);
   }
-
-  ldMsg('完成', 100);
-  hideLoading();
-
-  // 其餘延遲載入
-  setTimeout(() => {
-    if (S.pref.scan)   loadScanByMode('主力異動');
-    if (S.pref.big)    loadBigTab('台灣指數');
-  }, 500);
-
-  // 自動刷新（開市中每30秒）
-  setInterval(autoRefresh, 30000);
 });
 
 function hideLoading() {
   const ld = document.getElementById('loading');
   if (ld && ld.style.display !== 'none') {
+    console.log('Hiding loading screen...');
     ld.style.opacity = '0';
-    setTimeout(() => ld.style.display='none', 400);
-    renderNotifyList();
-    renderFeatGrid();
+    setTimeout(() => {
+      ld.style.display = 'none';
+      ld.style.pointerEvents = 'none'; // 確保不會擋住點擊
+    }, 400);
+    
+    // 渲染非關鍵 UI，包裹在 try 中防止報錯
+    try { renderNotifyList(); } catch(e) { console.error('Notify list render failed'); }
+    try { renderFeatGrid(); } catch(e) { console.error('Feat grid render failed'); }
   }
 }
 
@@ -1387,6 +1417,8 @@ function drawKline(data) {
       options:klineOpts(data,'成交量'),
     });
   }
+}
+
 async function doCheckIn() {
   if (!S.isLoggedIn) return ui.alert('請先登入 LINE');
   ldMsg('簽到中...', 50);
