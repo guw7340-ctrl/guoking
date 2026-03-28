@@ -424,14 +424,11 @@ canvas#klineChart{width:100%!important;height:100%!important}
     </div>
   </div>
   <div class="srch"><span>🔍</span><input type="text" id="mktSearch" placeholder="搜尋股票代號或名稱..." oninput="onSearch(this.value)"></div>
-  <div class="tabs" id="catTabs">
-    <div class="tab on" onclick="setCat(this,'all')">全部</div>
-    <div class="tab" onclick="setCat(this,'semi')">半導體</div>
-    <div class="tab" onclick="setCat(this,'ai')">AI概念</div>
-    <div class="tab" onclick="setCat(this,'ev')">電動車</div>
-    <div class="tab" onclick="setCat(this,'fin')">金融</div>
-    <div class="tab" onclick="setCat(this,'etf')">ETF</div>
-    <div class="tab" onclick="setCat(this,'day')">當沖熱門</div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <div class="tabs" id="catTabs" style="flex:1;margin:0;overflow-x:auto;white-space:nowrap;scrollbar-width:none">
+      <!-- 動態載入 -->
+    </div>
+    <button class="btn-sm" style="width:40px;padding:0;flex-shrink:0" onclick="openManageCat()">⚙️</button>
   </div>
   <div class="sec">即時報價</div>
   <div id="mktList"><div class="loading-row"><div class="spin"></div><br>載入中...</div></div>
@@ -682,6 +679,11 @@ canvas#klineChart{width:100%!important;height:100%!important}
         <div class="kline-tab" onclick="setKlineType(this,'vol')">量能</div>
         <div class="kline-tab" onclick="setKlineType(this,'macd')">MACD</div>
       </div>
+      <div style="display:flex;gap:5px;margin-top:8px" id="klineTimeframes">
+        <button class="btn-xs on" onclick="setKlineTimeframe(this,'day')">日線</button>
+        <button class="btn-xs" onclick="setKlineTimeframe(this,'week')">週線</button>
+        <button class="btn-xs" onclick="setKlineTimeframe(this,'month')">月線</button>
+      </div>
       <div class="kline-canvas-wrap">
         <canvas id="klineChart"></canvas>
       </div>
@@ -772,6 +774,25 @@ canvas#klineChart{width:100%!important;height:100%!important}
   </div>
 </div>
 
+<!-- 管理分類 -->
+<div class="ov" id="ovManageCat" onclick="closeOv(event,'ovManageCat')">
+  <div class="mdl" style="position:relative">
+    <div class="mdl-hnd"></div>
+    <button class="mdl-x" onclick="closeOvId('ovManageCat')">✕</button>
+    <div class="mdl-title">⚙️ 管理市場分類</div>
+    <div id="manageCatList" style="max-height:300px;overflow-y:auto;margin-bottom:12px"></div>
+    <div class="frow">
+      <div class="flbl">新增分類名稱</div>
+      <input class="finp" id="newCatName" placeholder="例：記憶體">
+    </div>
+    <div class="frow">
+      <div class="flbl">股票代號 (逗號隔開)</div>
+      <input class="finp" id="newCatCodes" placeholder="例：2330,2454">
+    </div>
+    <button class="btn-red" onclick="addCategory()">新增分類</button>
+  </div>
+</div>
+
 <!-- 美化 Alert / Confirm -->
 <div class="ov" id="ovAlert" style="z-index:2000;align-items:center">
   <div class="mdl" style="width:85%;max-width:320px;border-radius:16px;padding:24px;text-align:center;margin:auto;border:1px solid var(--bdr)">
@@ -809,10 +830,11 @@ const S = {
   priceCache:{},  // code→priceObj
   nameCache:{},   // code→name
   bigTab:'台灣指數',
-  klineChart:null, klineType:'candle',
+  klineChart:null, klineType:'candle', klineTimeframe:'day',
   adminTarget:null, adminPlan:null,
   pref:{},  // {watch:true, market:false, scan:false, big:false}
   alertResolver: null,
+  marketCategories: null, // { name: [codes] }
 };
 
 // ═══════════════════════════════════
@@ -1464,16 +1486,28 @@ function renderTopBuySell(r) {
 // ═══════════════════════════════════
 //  市場
 // ═══════════════════════════════════
-const MKT = {
-  all:  ['2330','2454','2317','2308','2303','2882','0050','2382','6505','3711'],
-  semi: ['2330','2454','2303','3711','3034'],
-  ai:   ['2317','2382','3006','6770','4935'],
-  ev:   ['2308','6669','3105','2337'],
-  fin:  ['2882','2881','2886','2884','2891'],
-  etf:  ['0050','0056','00878','00929','00919'],
-  day:  ['2330','2454','2317','2308','2382','6770'],
+const DEFAULT_MKT = {
+  '全部': ['2330','2454','2317','2308','2303','2882','0050','2382','6505','3711'],
+  '半導體': ['2330','2454','2303','3711','3034'],
+  'AI概念': ['2317','2382','3006','6770','4935'],
+  '電動車': ['2308','6669','3105','2337'],
+  '金融': ['2882','2881','2886','2884','2891'],
+  'ETF': ['0050','0056','00878','00929','00919'],
+  '當沖熱門': ['2330','2454','2317','2308','2382','6770'],
+  '記憶體': ['2344','2408','2337','3260','8299'],
+  '驅動IC': ['3034','3545','4961','8016','3527'],
+  'PCB載版': ['3037','8046','3189','2367','2313']
 };
-let curCat='all';
+let curCat='全部';
+
+function initMarketCategories() {
+  const saved = localStorage.getItem('marketCategories');
+  if (saved) {
+    try { S.marketCategories = JSON.parse(saved); } catch(e) { S.marketCategories = DEFAULT_MKT; }
+  } else {
+    S.marketCategories = DEFAULT_MKT;
+  }
+}
 
 async function loadIndex() {
   const r = await gas('getIndex');
@@ -1516,7 +1550,15 @@ async function loadIndex() {
 }
 
 async function loadMarket() {
-  const codes=MKT[curCat]||MKT.all;
+  if (!S.marketCategories) initMarketCategories();
+  const tabs = document.getElementById('catTabs');
+  if (tabs) {
+    tabs.innerHTML = Object.keys(S.marketCategories).map(name => 
+      `<div class="tab ${curCat===name?'on':''}" onclick="setCat(this,'${name}')">${name}</div>`
+    ).join('');
+  }
+  
+  const codes = S.marketCategories[curCat] || S.marketCategories['全部'] || [];
   document.getElementById('mktList').innerHTML='<div class="loading-row"><div class="spin"></div><br>載入中...</div>';
   const r=await gas('getPrices',{codes});
   if (r?.ok&&r.prices?.length) {
@@ -1548,8 +1590,52 @@ function renderMktList(prices) {
 }
 
 function setCat(el, cat) {
+  curCat = cat;
   document.querySelectorAll('#catTabs .tab').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on'); curCat=cat; loadMarket();
+  el.classList.add('on');
+  loadMarket();
+}
+
+function openManageCat() {
+  renderManageCat();
+  openOvId('ovManageCat');
+}
+
+function renderManageCat() {
+  const list = document.getElementById('manageCatList');
+  list.innerHTML = Object.keys(S.marketCategories).map(name => `
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;padding:8px 12px">
+      <div style="font-size:14px;font-weight:700">${name}</div>
+      <button class="btn-xs" style="background:var(--rb);color:var(--red);border:1px solid var(--bdrr)" onclick="deleteCategory('${name}')">刪除</button>
+    </div>
+  `).join('');
+}
+
+function addCategory() {
+  const name = document.getElementById('newCatName').value.trim();
+  const codesStr = document.getElementById('newCatCodes').value.trim();
+  if (!name) return ui.alert('請輸入分類名稱');
+  if (!codesStr) return ui.alert('請輸入股票代號');
+  
+  const codes = codesStr.split(',').map(c=>c.trim()).filter(c=>c);
+  S.marketCategories[name] = codes;
+  localStorage.setItem('marketCategories', JSON.stringify(S.marketCategories));
+  
+  document.getElementById('newCatName').value = '';
+  document.getElementById('newCatCodes').value = '';
+  renderManageCat();
+  loadMarket();
+  ui.toast('已新增分類');
+}
+
+function deleteCategory(name) {
+  if (Object.keys(S.marketCategories).length <= 1) return ui.alert('至少保留一個分類');
+  delete S.marketCategories[name];
+  if (curCat === name) curCat = Object.keys(S.marketCategories)[0];
+  localStorage.setItem('marketCategories', JSON.stringify(S.marketCategories));
+  renderManageCat();
+  loadMarket();
+  ui.toast('已刪除分類');
 }
 function onSearch(q) {
   const prices=Object.values(S.priceCache);
