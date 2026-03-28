@@ -3,348 +3,363 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>當沖圍中紅龍 VER1.0</title>
+<title>當沖圍中紅龍 VER1.1</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap');
 :root{
-  --bg0:#07090d;--bg1:#0d1117;--bg2:#111820;--bg3:#161e2a;
-  --red:#ff2233;--red2:#cc1122;--red-g:rgba(255,34,51,.18);--red-b:rgba(255,34,51,.08);
-  --grn:#00e676;--grn-g:rgba(0,230,118,.18);
-  --gold:#ffd700;--gold-g:rgba(255,215,0,.15);
-  --blue:#00b4ff;--blue-g:rgba(0,180,255,.15);
-  --purple:#a855f7;
-  --t1:#e8edf5;--t2:#8896a8;--t3:#445566;
-  --bdr:rgba(255,255,255,.07);--bdr-r:rgba(255,34,51,.4);
-  --mono:'Share Tech Mono',monospace;
-  --font:'Noto Sans TC',sans-serif;
-  --radius:12px;--radius-sm:8px;
-  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --bg0:#05070b;--bg1:#0a0f17;--bg2:#0f1620;--bg3:#141c28;--bg4:#1a2235;
+  --red:#ff2233;--red2:#cc1122;--rg:rgba(255,34,51,.18);--rb:rgba(255,34,51,.08);
+  --grn:#00e676;--gg:rgba(0,230,118,.18);
+  --gold:#ffd700;--gdg:rgba(255,215,0,.15);
+  --blue:#00b4ff;--blg:rgba(0,180,255,.15);
+  --purple:#a855f7;--plg:rgba(168,85,247,.15);
+  --t1:#e8edf5;--t2:#8896a8;--t3:#3a4a5c;--t4:#222c38;
+  --bdr:rgba(255,255,255,.06);--bdrr:rgba(255,34,51,.35);--bdrg:rgba(0,230,118,.35);
+  --mono:'Share Tech Mono',monospace;--font:'Noto Sans TC',sans-serif;
+  --r:12px;--rs:8px;--safe:env(safe-area-inset-bottom,0px);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--t1);font-family:var(--font)}
-
-/* Grid bg */
-body::before{content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse at 20% 50%,rgba(255,34,51,.04) 0,transparent 60%),
-    radial-gradient(ellipse at 80% 20%,rgba(0,180,255,.03) 0,transparent 50%),
-    linear-gradient(var(--bdr) 1px,transparent 1px) 0 0/44px 44px,
-    linear-gradient(90deg,var(--bdr) 1px,transparent 1px) 0 0/44px 44px;
-  pointer-events:none;z-index:0}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 15% 50%,rgba(255,34,51,.05) 0,transparent 55%),
+    radial-gradient(ellipse at 85% 20%,rgba(0,180,255,.04) 0,transparent 45%),
+    linear-gradient(var(--bdr) 1px,transparent 1px) 0 0/40px 40px,
+    linear-gradient(90deg,var(--bdr) 1px,transparent 1px) 0 0/40px 40px}
 
 /* ── Layout ── */
 #app{display:flex;flex-direction:column;height:100%;position:relative;z-index:1}
-#hdr{height:52px;background:var(--bg1);border-bottom:1px solid var(--bdr);
-  display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;position:relative}
+#hdr{height:50px;background:var(--bg1);border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:space-between;padding:0 14px;
+  flex-shrink:0;position:relative}
 #hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--red),transparent)}
-#main{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;
+  background:linear-gradient(90deg,transparent,var(--red) 30%,var(--red) 70%,transparent)}
+#main{flex:1;overflow-y:auto;overflow-x:hidden;
   scrollbar-width:thin;scrollbar-color:var(--red) transparent}
 #main::-webkit-scrollbar{width:2px}
 #main::-webkit-scrollbar-thumb{background:var(--red)}
-#nav{background:var(--bg1);border-top:1px solid var(--bdr);display:flex;flex-shrink:0;
-  padding-bottom:var(--safe-bottom)}
+#nav{background:var(--bg1);border-top:1px solid var(--bdr);display:flex;
+  flex-shrink:0;padding-bottom:var(--safe)}
 
 /* ── Logo ── */
-.logo{display:flex;align-items:center;gap:9px}
-.logo-box{width:30px;height:30px;background:linear-gradient(135deg,var(--red),#ff6533);
-  border-radius:8px;display:flex;align-items:center;justify-content:center;
-  font-size:17px;box-shadow:0 0 12px rgba(255,34,51,.5);flex-shrink:0}
-.logo-txt{font-size:13px;font-weight:800;letter-spacing:.5px;
+.logo{display:flex;align-items:center;gap:8px}
+.logo-box{width:28px;height:28px;background:linear-gradient(135deg,var(--red),#ff6533);
+  border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:15px;box-shadow:0 0 10px rgba(255,34,51,.5);flex-shrink:0}
+.logo-txt{font-size:12px;font-weight:800;letter-spacing:.5px;
   background:linear-gradient(90deg,var(--red),var(--gold));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hdr-r{display:flex;align-items:center;gap:8px}
-.mkt-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:1px}
-.mkt-open{background:var(--grn-g);color:var(--grn);border:1px solid var(--grn)}
-.mkt-close{background:rgba(100,100,100,.15);color:#666;border:1px solid #333}
-.av-wrap{width:28px;height:28px;border-radius:50%;overflow:hidden;border:1.5px solid var(--bdr-r);cursor:pointer}
+.ver-tag{font-size:9px;background:var(--rb);color:var(--red);border:1px solid var(--bdrr);
+  border-radius:4px;padding:1px 4px;font-weight:700;margin-left:4px;-webkit-text-fill-color:var(--red)}
+.hdr-r{display:flex;align-items:center;gap:6px}
+.mkt-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;letter-spacing:1px}
+.mkt-open{background:var(--gg);color:var(--grn);border:1px solid var(--grn)}
+.mkt-close{background:rgba(100,100,100,.12);color:#555;border:1px solid #2a2a2a}
+.trial-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;
+  background:var(--gdg);color:var(--gold);border:1px solid rgba(255,215,0,.4)}
+.av-wrap{width:26px;height:26px;border-radius:50%;overflow:hidden;
+  border:1.5px solid var(--bdrr);cursor:pointer}
 .av-wrap img{width:100%;height:100%;object-fit:cover}
 
 /* ── Nav ── */
-.nav-btn{flex:1;padding:8px 4px 9px;display:flex;flex-direction:column;align-items:center;gap:2px;
-  background:none;border:none;color:var(--t3);cursor:pointer;transition:color .2s;position:relative}
+.nav-btn{flex:1;padding:7px 2px 8px;display:flex;flex-direction:column;align-items:center;
+  gap:2px;background:none;border:none;color:var(--t3);cursor:pointer;
+  transition:color .2s;position:relative}
 .nav-btn::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
   width:0;height:2px;border-radius:0 0 2px 2px;background:var(--red);transition:width .25s}
-.nav-btn.on{color:var(--red)}
-.nav-btn.on::before{width:22px}
-.nav-ico{font-size:19px}
-.nav-lbl{font-size:10px;font-weight:600}
+.nav-btn.on{color:var(--red)}.nav-btn.on::before{width:20px}
+.nav-ico{font-size:18px}.nav-lbl{font-size:9px;font-weight:600}
 
 /* ── Pages ── */
-.pg{display:none;padding:12px 12px 80px;animation:fadeIn .25s ease}
+.pg{display:none;padding:10px 10px 78px;animation:fadeIn .2s ease}
 .pg.on{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── Cards ── */
-.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius);padding:13px}
-.card+.card{margin-top:8px}
-.card-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.card-title{font-size:12px;font-weight:700;color:var(--t2);letter-spacing:1.5px;text-transform:uppercase}
+/* ── Cards & Sections ── */
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:12px}
+.card+.card{margin-top:7px}
+.sec{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:2px;
+  text-transform:uppercase;margin:12px 0 7px;display:flex;align-items:center;gap:7px}
+.sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent)}
 
-/* ── Section label ── */
-.sec-lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:2px;
-  text-transform:uppercase;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
-.sec-lbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent)}
-
-/* ── Numbers ── */
-.num{font-family:var(--mono)}
-.up{color:var(--red)}
-.dn{color:var(--grn)}
-.neu{color:var(--t2)}
-
-/* ── Index display ── */
-.idx-box{background:linear-gradient(135deg,var(--bg2) 0%,rgba(255,34,51,.07) 100%);
-  border:1px solid rgba(255,34,51,.2);border-radius:var(--radius);padding:16px;margin-bottom:10px;
-  position:relative;overflow:hidden}
-.idx-box::after{content:'加權';position:absolute;right:-8px;top:-4px;
-  font-size:56px;font-weight:900;color:rgba(255,34,51,.04);pointer-events:none}
+/* ── Index box ── */
+.idx-box{background:linear-gradient(135deg,var(--bg2) 0%,rgba(255,34,51,.06) 100%);
+  border:1px solid rgba(255,34,51,.18);border-radius:var(--r);padding:14px;
+  margin-bottom:8px;position:relative;overflow:hidden}
+.idx-box::after{content:'指';position:absolute;right:-4px;top:-6px;
+  font-size:64px;font-weight:900;color:rgba(255,34,51,.04);pointer-events:none}
 .idx-lbl{font-size:10px;color:var(--t3);letter-spacing:2px}
-.idx-val{font-family:var(--mono);font-size:34px;font-weight:900;color:var(--red);
-  text-shadow:0 0 16px rgba(255,34,51,.4);margin:3px 0}
-.idx-chg{font-size:13px;font-weight:700}
-.idx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
-.idx-cell{background:rgba(255,255,255,.03);border-radius:8px;padding:7px;text-align:center}
-.idx-cell-v{font-size:13px;font-weight:700;font-family:var(--mono)}
-.idx-cell-l{font-size:9px;color:var(--t3);margin-top:2px}
+.idx-val{font-family:var(--mono);font-size:32px;font-weight:900;color:var(--red);
+  text-shadow:0 0 14px rgba(255,34,51,.4);margin:2px 0;min-height:40px}
+.idx-chg{font-size:12px;font-weight:700}
+.idx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:10px}
+.idx-cell{background:rgba(255,255,255,.03);border-radius:7px;padding:6px;text-align:center}
+.idx-cv{font-size:12px;font-weight:700;font-family:var(--mono)}
+.idx-cl{font-size:9px;color:var(--t3);margin-top:1px}
 
 /* ── Stock cards ── */
-.sc{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius);
-  padding:12px;margin-bottom:7px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.sc{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);
+  padding:11px;margin-bottom:6px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
 .sc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px}
-.sc.up-c::before{background:var(--red)}
-.sc.dn-c::before{background:var(--grn)}
-.sc:hover{border-color:var(--bdr-r);background:var(--bg3);transform:translateX(2px)}
-.sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.sc-name{font-size:15px;font-weight:700}
+.sc.up::before{background:var(--red)}.sc.dn::before{background:var(--grn)}
+.sc:hover{border-color:var(--bdrr);background:var(--bg3);transform:translateX(2px)}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px}
+.sc-name{font-size:14px;font-weight:700}
 .sc-code{font-size:10px;color:var(--t3);margin-top:1px}
-.sc-price{text-align:right}
-.sc-pv{font-family:var(--mono);font-size:20px;font-weight:700}
+.sc-pv{font-family:var(--mono);font-size:19px;font-weight:700;text-align:right}
 .sc-chg{font-size:11px;font-weight:600;text-align:right}
-.sc-bot{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.ms{background:rgba(255,255,255,.03);border-radius:6px;padding:4px 6px}
-.ms-l{font-size:9px;color:var(--t3)}
-.ms-v{font-size:11px;font-weight:600;color:var(--t2)}
+.sc-bot{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+.ms{background:rgba(255,255,255,.03);border-radius:5px;padding:3px 5px}
+.ms-l{font-size:8px;color:var(--t3)}.ms-v{font-size:10px;font-weight:600;color:var(--t2)}
+/* 股票操作按鈕 */
+.sc-actions{position:absolute;right:8px;top:8px;display:flex;gap:4px;opacity:0;transition:opacity .2s}
+.sc:hover .sc-actions{opacity:1}
+.sc-act{background:var(--bg4);border:1px solid var(--bdr);border-radius:5px;
+  padding:3px 6px;font-size:10px;cursor:pointer;transition:all .15s;color:var(--t2)}
+.sc-act:hover{border-color:var(--bdrr);color:var(--red)}
+.sc-act.del:hover{border-color:var(--bdrg);color:var(--grn)}
 
-/* ── Loading spinner ── */
-.spin{width:18px;height:18px;border:2px solid var(--bdr);border-top-color:var(--red);
-  border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+/* ── Spinner ── */
+.spin{width:16px;height:16px;border:2px solid var(--bdr);border-top-color:var(--red);
+  border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
+.loading-row{text-align:center;padding:24px 0;color:var(--t3);font-size:12px}
 
 /* ── Search ── */
-.srch{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-sm);
-  display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:10px;transition:border-color .2s}
-.srch:focus-within{border-color:var(--bdr-r)}
-.srch input{flex:1;background:none;border:none;outline:none;color:var(--t1);font-size:14px;font-family:var(--font)}
+.srch{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
+  display:flex;align-items:center;gap:7px;padding:9px 11px;margin-bottom:9px;
+  transition:border-color .2s}
+.srch:focus-within{border-color:var(--bdrr)}
+.srch input{flex:1;background:none;border:none;outline:none;color:var(--t1);
+  font-size:14px;font-family:var(--font)}
 .srch input::placeholder{color:var(--t3)}
 
-/* ── Cat tabs ── */
-.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px;scrollbar-width:none}
+/* ── Tabs ── */
+.tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:7px;margin-bottom:9px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex-shrink:0;background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;
-  padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;
+  padding:4px 11px;font-size:11px;font-weight:600;cursor:pointer;transition:all .18s;
   color:var(--t2);white-space:nowrap}
 .tab.on{background:var(--red);border-color:var(--red);color:#fff}
 
 /* ── Stock list item ── */
-.sli{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;
-  background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-sm);
-  margin-bottom:5px;cursor:pointer;transition:all .2s}
-.sli:hover{border-color:var(--bdr-r)}
-.sli-n{font-size:13px;font-weight:700}
-.sli-c{font-size:10px;color:var(--t3)}
-.sli-p{font-family:var(--mono);font-size:14px;font-weight:700}
-.sli-ch{font-size:11px;font-weight:600}
+.sli{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;
+  background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
+  margin-bottom:5px;cursor:pointer;transition:all .18s}
+.sli:hover{border-color:var(--bdrr)}
+.sli-n{font-size:13px;font-weight:700}.sli-c{font-size:10px;color:var(--t3)}
+.sli-p{font-family:var(--mono);font-size:13px;font-weight:700;text-align:right}
+.sli-ch{font-size:11px;font-weight:600;text-align:right}
 
-/* ── Overlay / Modal ── */
+/* ── Overlays ── */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;
-  display:none;align-items:flex-end;animation:ovIn .2s ease}
-.ov.on{display:flex}
+  display:none;align-items:flex-end}
+.ov.on{display:flex;animation:ovIn .18s ease}
 @keyframes ovIn{from{opacity:0}to{opacity:1}}
 .mdl{background:var(--bg1);border-top:1px solid var(--bdr);border-radius:20px 20px 0 0;
-  width:100%;max-height:88vh;overflow-y:auto;padding:18px;
-  animation:slideUp .3s cubic-bezier(.34,1.56,.64,1)}
+  width:100%;max-height:90vh;overflow-y:auto;padding:16px;
+  animation:slideUp .28s cubic-bezier(.34,1.56,.64,1)}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.mdl-hnd{width:36px;height:4px;background:var(--t3);border-radius:2px;margin:0 auto 14px}
-.mdl-title{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.mdl-close{position:absolute;top:15px;right:15px;background:none;border:none;
-  color:var(--t3);font-size:20px;cursor:pointer;width:30px;height:30px;
-  display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s}
-.mdl-close:hover{background:var(--bg3)}
+.mdl-hnd{width:34px;height:4px;background:var(--t3);border-radius:2px;margin:0 auto 12px}
+.mdl-title{font-size:14px;font-weight:700;margin-bottom:12px}
+.mdl-x{position:absolute;top:13px;right:13px;background:none;border:none;
+  color:var(--t3);font-size:20px;cursor:pointer;width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .18s}
+.mdl-x:hover{background:var(--bg3)}
 
-/* ── Core func grid ── */
-.cf-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
-.cf-btn{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-sm);
-  padding:11px;cursor:pointer;transition:all .2s;text-align:left}
-.cf-btn:hover,.cf-btn.on{border-color:var(--bdr-r);background:var(--red-b)}
-.cf-ico{font-size:20px;margin-bottom:3px}
-.cf-nm{font-size:12px;font-weight:700}
-.cf-ds{font-size:10px;color:var(--t3);margin-top:1px}
+/* ── Core func chips ── */
+.cf-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.cf-btn{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:10px;cursor:pointer;transition:all .18s;text-align:left}
+.cf-btn:hover,.cf-btn.on{border-color:var(--bdrr);background:var(--rb)}
+.cf-ico{font-size:18px;margin-bottom:2px}.cf-nm{font-size:11px;font-weight:700}
+.cf-ds{font-size:9px;color:var(--t3);margin-top:1px}
 
 /* ── Data rows ── */
 .drow{display:flex;justify-content:space-between;align-items:center;
-  padding:9px 0;border-bottom:1px solid var(--bdr)}
+  padding:8px 0;border-bottom:1px solid var(--bdr)}
 .drow:last-child{border-bottom:none}
-.dl{font-size:12px;color:var(--t2)}
-.dv{font-size:13px;font-weight:700;font-family:var(--mono)}
+.dl{font-size:12px;color:var(--t2)}.dv{font-size:12px;font-weight:700;font-family:var(--mono)}
 
-/* ── Notify ── */
-.nf-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-sm);
-  padding:12px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
-.nf-nm{font-size:13px;font-weight:700}
-.nf-cond{font-size:11px;color:var(--t2);margin-top:3px}
-.nbadge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
-.nb-buy{background:var(--red-b);color:var(--red);border:1px solid rgba(255,34,51,.3)}
-.nb-sell{background:var(--grn-g);color:var(--grn);border:1px solid rgba(0,230,118,.3)}
-.tgl{width:38px;height:21px;background:var(--bg3);border-radius:11px;position:relative;
-  cursor:pointer;border:1px solid var(--bdr);transition:background .2s;flex-shrink:0}
+/* ── Colors ── */
+.up{color:var(--red)}.dn{color:var(--grn)}.neu{color:var(--t2)}
+
+/* ── Notify cards ── */
+.nf-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:11px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.nf-nm{font-size:12px;font-weight:700}.nf-cond{font-size:10px;color:var(--t2);margin-top:2px}
+.nbadge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px}
+.nb-buy{background:var(--rb);color:var(--red);border:1px solid rgba(255,34,51,.3)}
+.nb-sell{background:var(--gg);color:var(--grn);border:1px solid rgba(0,230,118,.3)}
+.tgl{width:36px;height:20px;background:var(--bg3);border-radius:10px;
+  position:relative;cursor:pointer;border:1px solid var(--bdr);transition:background .18s;flex-shrink:0}
 .tgl.on{background:var(--red);border-color:var(--red)}
-.tgl::after{content:'';width:15px;height:15px;background:#fff;border-radius:50%;
-  position:absolute;top:2px;left:2px;transition:transform .2s}
-.tgl.on::after{transform:translateX(17px)}
+.tgl::after{content:'';width:14px;height:14px;background:#fff;border-radius:50%;
+  position:absolute;top:2px;left:2px;transition:transform .18s}
+.tgl.on::after{transform:translateX(16px)}
 
-/* ── Form ── */
-.frow{margin-bottom:10px}
-.flbl{font-size:11px;color:var(--t3);margin-bottom:5px}
-.finp{width:100%;background:var(--bg1);border:1px solid var(--bdr);border-radius:var(--radius-sm);
-  padding:9px 12px;color:var(--t1);font-size:14px;font-family:var(--font);outline:none;transition:border-color .2s}
-.finp:focus{border-color:var(--bdr-r)}
-.fradio{display:flex;gap:7px}
-.frbtn{flex:1;background:var(--bg1);border:1px solid var(--bdr);border-radius:var(--radius-sm);
-  padding:8px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;color:var(--t2)}
-.frbtn.sel-buy{border-color:var(--red);background:var(--red-b);color:var(--red)}
-.frbtn.sel-sell{border-color:var(--grn);background:var(--grn-g);color:var(--grn)}
-.frbtn.sel-line{border-color:var(--blue);background:var(--blue-g);color:var(--blue)}
-.frbtn.sel-tg{border-color:var(--gold);background:var(--gold-g);color:var(--gold)}
+/* ── Forms ── */
+.frow{margin-bottom:9px}
+.flbl{font-size:11px;color:var(--t3);margin-bottom:4px}
+.finp{width:100%;background:var(--bg0);border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:9px 11px;color:var(--t1);font-size:13px;font-family:var(--font);
+  outline:none;transition:border-color .18s}
+.finp:focus{border-color:var(--bdrr)}
+.fradio{display:flex;gap:6px}
+.frbtn{flex:1;background:var(--bg0);border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:7px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;
+  transition:all .18s;color:var(--t2)}
+.frbtn.sel-buy{border-color:var(--red);background:var(--rb);color:var(--red)}
+.frbtn.sel-sell{border-color:var(--grn);background:var(--gg);color:var(--grn)}
+.frbtn.sel-line{border-color:var(--blue);background:var(--blg);color:var(--blue)}
+.frbtn.sel-tg{border-color:var(--gold);background:var(--gdg);color:var(--gold)}
+.frbtn.sel-both{border-color:var(--purple);background:var(--plg);color:var(--purple)}
+.frbtn.disabled{opacity:.35;pointer-events:none}
 
 /* ── Buttons ── */
 .btn-red{background:linear-gradient(135deg,var(--red),#ff5533);border:none;color:#fff;
-  font-size:14px;font-weight:700;padding:12px;border-radius:var(--radius-sm);
-  cursor:pointer;width:100%;font-family:var(--font);transition:opacity .2s}
-.btn-red:hover{opacity:.9}
-.btn-outline{background:none;border:1px solid var(--bdr);border-radius:var(--radius-sm);
-  padding:10px;font-size:13px;color:var(--t2);cursor:pointer;width:100%;
-  font-family:var(--font);transition:all .2s}
-.btn-outline:hover{border-color:var(--bdr-r);color:var(--t1)}
-.btn-line{background:#06C755;border:none;color:#fff;font-size:14px;font-weight:700;
-  padding:13px;border-radius:var(--radius-sm);cursor:pointer;width:100%;
-  display:flex;align-items:center;justify-content:center;gap:9px;font-family:var(--font);transition:all .2s}
+  font-size:13px;font-weight:700;padding:11px;border-radius:var(--rs);
+  cursor:pointer;width:100%;font-family:var(--font);transition:opacity .18s}
+.btn-red:hover{opacity:.88}
+.btn-outline{background:none;border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:9px;font-size:12px;color:var(--t2);cursor:pointer;width:100%;
+  font-family:var(--font);transition:all .18s}
+.btn-outline:hover{border-color:var(--bdrr);color:var(--t1)}
+.btn-line{background:#06C755;border:none;color:#fff;font-size:13px;font-weight:700;
+  padding:12px;border-radius:var(--rs);cursor:pointer;width:100%;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--font);transition:background .18s}
 .btn-line:hover{background:#05a347}
-.btn-sm{background:var(--red-b);border:1px solid var(--bdr-r);color:var(--red);
-  font-size:11px;font-weight:700;padding:5px 10px;border-radius:6px;cursor:pointer;
-  transition:all .2s;white-space:nowrap}
+.btn-sm{background:var(--rb);border:1px solid var(--bdrr);color:var(--red);
+  font-size:10px;font-weight:700;padding:4px 9px;border-radius:5px;
+  cursor:pointer;transition:all .18s;white-space:nowrap}
 .btn-sm:hover{background:var(--red);color:#fff}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#ff8c00);border:none;
+  color:#000;font-size:13px;font-weight:700;padding:11px;border-radius:var(--rs);
+  cursor:pointer;width:100%;font-family:var(--font)}
 
 /* ── Scan ── */
-.scan-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}
-.scan-opt{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-sm);
-  padding:11px;cursor:pointer;transition:all .2s;text-align:center}
-.scan-opt.on{border-color:var(--gold);background:rgba(255,215,0,.06)}
-.so-ico{font-size:22px;margin-bottom:3px}
-.so-nm{font-size:12px;font-weight:700}
-.so-ds{font-size:10px;color:var(--t3)}
-.sig-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius-sm);
-  padding:11px;margin-bottom:6px;display:flex;align-items:center;gap:10px;cursor:pointer}
-.sig-ico{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;
-  justify-content:center;font-size:18px;flex-shrink:0}
-.si-buy{background:var(--red-b)}
-.si-sell{background:var(--grn-g)}
-.si-neu{background:var(--blue-g)}
-.sig-inf{flex:1}
-.si-nm{font-size:13px;font-weight:700}
-.si-dt{font-size:11px;color:var(--t2);margin-top:2px}
-.si-tm{font-size:10px;color:var(--t3)}
-.si-sc{font-family:var(--mono);font-size:17px;font-weight:700}
+.scan-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.scan-opt{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:10px;cursor:pointer;transition:all .18s;text-align:center}
+.scan-opt.on{border-color:var(--gold);background:rgba(255,215,0,.05)}
+.so-ico{font-size:20px;margin-bottom:2px}.so-nm{font-size:11px;font-weight:700}
+.so-ds{font-size:9px;color:var(--t3)}
+.sig-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:10px;margin-bottom:5px;display:flex;align-items:center;gap:9px;cursor:pointer}
+.sig-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:16px;flex-shrink:0}
+.si-buy{background:var(--rb)}.si-sell{background:var(--gg)}.si-neu{background:var(--blg)}
+.sig-inf{flex:1}.si-nm{font-size:12px;font-weight:700}
+.si-dt{font-size:10px;color:var(--t2);margin-top:1px}.si-tm{font-size:9px;color:var(--t3)}
+.si-sc{font-family:var(--mono);font-size:16px;font-weight:700}
+.strat-chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg3);
+  border:1px solid var(--bdr);border-radius:20px;padding:3px 9px;
+  font-size:10px;font-weight:600;color:var(--t2);margin:2px;cursor:pointer}
+.strat-chip.on{background:var(--rb);border-color:var(--bdrr);color:var(--red)}
 
 /* ── Member ── */
-.mem-card{background:linear-gradient(135deg,var(--bg2) 0%,rgba(255,34,51,.06) 100%);
-  border:1px solid rgba(255,34,51,.15);border-radius:var(--radius);padding:18px;
-  text-align:center;margin-bottom:10px}
-.mem-av{width:68px;height:68px;border-radius:50%;border:2.5px solid var(--red);
-  margin:0 auto 10px;display:block;object-fit:cover}
-.mem-name{font-size:17px;font-weight:700}
-.plan-tag{display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;
-  border-radius:20px;margin-top:5px;letter-spacing:1px}
-.pt-free{background:var(--red-b);border:1px solid var(--bdr-r);color:var(--red)}
-.pt-monthly{background:var(--blue-g);border:1px solid rgba(0,180,255,.3);color:var(--blue)}
-.pt-yearly{background:var(--gold-g);border:1px solid rgba(255,215,0,.3);color:var(--gold)}
-.pt-admin{background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:var(--purple)}
-
-.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.plan-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--radius);
-  padding:13px;text-align:center;cursor:pointer;transition:all .2s}
-.plan-card.rec{border-color:var(--gold);background:rgba(255,215,0,.05)}
-.pl-nm{font-size:14px;font-weight:700}
-.pl-pr{font-family:var(--mono);font-size:22px;font-weight:900;color:var(--red);margin:5px 0}
-.pl-pd{font-size:10px;color:var(--t3)}
-.pl-ft{font-size:11px;color:var(--t2);margin-top:7px;line-height:1.7}
+.mem-card{background:linear-gradient(135deg,var(--bg2) 0%,rgba(255,34,51,.05) 100%);
+  border:1px solid rgba(255,34,51,.15);border-radius:var(--r);padding:16px;
+  text-align:center;margin-bottom:9px}
+.mem-av{width:64px;height:64px;border-radius:50%;border:2px solid var(--red);
+  margin:0 auto 9px;display:block;object-fit:cover}
+.mem-name{font-size:16px;font-weight:700}
+.plan-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;
+  border-radius:20px;margin-top:4px;letter-spacing:1px}
+.pt-free{background:var(--rb);border:1px solid var(--bdrr);color:var(--red)}
+.pt-monthly{background:var(--blg);border:1px solid rgba(0,180,255,.3);color:var(--blue)}
+.pt-yearly{background:var(--gdg);border:1px solid rgba(255,215,0,.3);color:var(--gold)}
+.pt-admin{background:var(--plg);border:1px solid rgba(168,85,247,.3);color:var(--purple)}
+.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.plan-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);
+  padding:12px;text-align:center;cursor:pointer;transition:all .18s}
+.plan-card.rec{border-color:var(--gold);background:rgba(255,215,0,.04)}
+.pl-nm{font-size:13px;font-weight:700}.pl-pr{font-family:var(--mono);font-size:20px;font-weight:900;color:var(--red);margin:4px 0}
+.pl-pd{font-size:9px;color:var(--t3)}.pl-ft{font-size:10px;color:var(--t2);margin-top:6px;line-height:1.7}
 
 /* ── Admin ── */
-.adm-box{background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.2);
-  border-radius:var(--radius);padding:14px;margin-bottom:10px}
-.adm-title{font-size:13px;font-weight:700;color:var(--purple);
-  display:flex;align-items:center;gap:7px;margin-bottom:12px}
-.tbl{width:100%;border-collapse:collapse;font-size:11px}
-.tbl th{color:var(--t3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--bdr)}
-.tbl td{padding:8px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--t2)}
-.sbadge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px}
-.sb-ok{background:var(--grn-g);color:var(--grn)}
-.sb-no{background:rgba(100,100,100,.15);color:#555}
+.adm-box{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);
+  border-radius:var(--r);padding:12px;margin-bottom:9px}
+.adm-title{font-size:12px;font-weight:700;color:var(--purple);margin-bottom:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:10px}
+.tbl th{color:var(--t3);text-align:left;padding:5px 7px;border-bottom:1px solid var(--bdr)}
+.tbl td{padding:7px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--t2)}
+.sbadge{font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px}
+.sb-ok{background:var(--gg);color:var(--grn)}.sb-no{background:rgba(80,80,80,.15);color:#555}
+.sb-admin{background:var(--plg);color:var(--purple)}
+/* 管理員設定方案 */
+.adm-act{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;cursor:pointer;
+  background:var(--plg);border:1px solid rgba(168,85,247,.3);color:var(--purple)}
+
+/* ── K 線圖 ── */
+.kline-wrap{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);
+  padding:12px;margin-top:8px;position:relative}
+.kline-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.kline-name{font-size:14px;font-weight:700}
+.kline-tabs{display:flex;gap:4px}
+.kline-tab{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;cursor:pointer;
+  background:var(--bg3);border:1px solid var(--bdr);color:var(--t3);transition:all .15s}
+.kline-tab.on{background:var(--red);border-color:var(--red);color:#fff}
+.kline-canvas-wrap{position:relative;height:260px}
+canvas#klineChart{width:100%!important;height:100%!important}
+/* 當沖指標列 */
+.dt-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px}
+.dt-stat{background:var(--bg3);border-radius:7px;padding:7px;text-align:center}
+.dt-stat-v{font-size:13px;font-weight:700;font-family:var(--mono)}
+.dt-stat-l{font-size:9px;color:var(--t3);margin-top:1px}
+/* 量能條 */
+.vol-bar-wrap{margin-top:8px}
+.vol-bar-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.vol-bar-lbl{width:28px;font-size:9px;color:var(--t3);text-align:right}
+.vol-bar{flex:1;height:10px;background:var(--bg3);border-radius:5px;overflow:hidden}
+.vol-bar-fill{height:100%;border-radius:5px;transition:width .5s ease}
+.vb-red{background:linear-gradient(90deg,var(--red2),var(--red))}
+.vb-grn{background:linear-gradient(90deg,#009944,var(--grn))}
+
+/* ── 快取設定 modal ── */
+.pref-item{display:flex;justify-content:space-between;align-items:center;
+  padding:9px 0;border-bottom:1px solid var(--bdr)}
+.pref-item:last-child{border-bottom:none}
+.pref-lbl{font-size:12px;font-weight:600}
+.pref-desc{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* ── Day-trade member features ── */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.feat-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:11px;text-align:center;cursor:pointer;transition:all .18s;position:relative}
+.feat-card:hover{border-color:var(--bdrr)}
+.feat-card .lock{position:absolute;top:5px;right:7px;font-size:11px}
+.feat-ico{font-size:22px;margin-bottom:3px}
+.feat-nm{font-size:11px;font-weight:700}.feat-ds{font-size:9px;color:var(--t3);margin-top:1px}
+.feat-lock-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);
+  border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:18px}
 
 /* ── Toast ── */
-#toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(16px);
-  background:rgba(13,17,23,.97);border:1px solid var(--bdr);border-radius:var(--radius-sm);
-  padding:9px 16px;font-size:12px;font-weight:600;z-index:300;opacity:0;
-  transition:all .25s;white-space:nowrap;pointer-events:none}
+#toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%) translateY(14px);
+  background:rgba(10,15,23,.97);border:1px solid var(--bdr);border-radius:var(--rs);
+  padding:8px 14px;font-size:12px;font-weight:600;z-index:500;opacity:0;
+  transition:all .22s;white-space:nowrap;pointer-events:none;max-width:90vw}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ── Loading ── */
 #loading{position:fixed;inset:0;background:var(--bg0);z-index:999;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
-  transition:opacity .4s}
-.ld-logo{font-size:52px;font-weight:900;background:linear-gradient(90deg,var(--red),var(--gold));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;transition:opacity .4s}
+.ld-logo{font-size:50px;font-weight:900;
+  background:linear-gradient(90deg,var(--red),var(--gold));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pulse 1.4s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .ld-sub{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--t3)}
-.ld-bar{width:100px;height:2px;background:var(--bg3);border-radius:1px;overflow:hidden}
-.ld-fill{height:100%;background:var(--red);animation:ldBar 1.6s ease-in-out infinite}
+.ld-bar{width:90px;height:2px;background:var(--bg3);border-radius:1px;overflow:hidden}
+.ld-fill{height:100%;background:var(--red);animation:ldBar 1.5s ease-in-out infinite}
 @keyframes ldBar{0%{width:0}80%{width:100%}100%{width:100%;opacity:0}}
-.ld-msg{font-size:12px;color:var(--t3)}
-
-/* ── Chip analysis panel ── */
-.chip-tabs{display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none}
-.chip-tabs::-webkit-scrollbar{display:none}
-.chtab{flex-shrink:0;background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;
-  padding:4px 11px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--t2)}
-.chtab.on{background:var(--red);border-color:var(--red);color:#fff}
-
-/* ── Progress bars ── */
-.pbar-wrap{margin:6px 0}
-.pbar-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-bottom:4px}
-.pbar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
-.pbar-fill{height:100%;border-radius:3px;transition:width .5s ease}
-.pb-red{background:linear-gradient(90deg,var(--red2),var(--red))}
-.pb-grn{background:linear-gradient(90deg,#00a854,var(--grn))}
-.pb-blue{background:linear-gradient(90deg,#0066aa,var(--blue))}
-
-/* Day trade heat badge */
-.heat{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;
-  padding:2px 7px;border-radius:20px}
-.heat-h{background:rgba(255,34,51,.2);color:var(--red);border:1px solid rgba(255,34,51,.3)}
-.heat-m{background:rgba(255,165,0,.15);color:#ffa500;border:1px solid rgba(255,165,0,.3)}
-.heat-l{background:rgba(100,100,100,.15);color:#666;border:1px solid #333}
-
-/* strategy */
-.strat-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);
-  border:1px solid var(--bdr);border-radius:20px;padding:4px 10px;font-size:11px;
-  font-weight:600;color:var(--t2);margin:3px;cursor:pointer;transition:all .2s}
-.strat-chip.on{background:var(--red-b);border-color:var(--bdr-r);color:var(--red)}
-
-/* no-data */
-.no-data{text-align:center;padding:32px 0;color:var(--t3);font-size:13px}
-
-/* error banner */
-.err-banner{background:rgba(255,34,51,.1);border:1px solid rgba(255,34,51,.3);
-  border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--red);margin-bottom:10px}
+.ld-msg{font-size:11px;color:var(--t3)}
+.err-banner{background:var(--rb);border:1px solid var(--bdrr);border-radius:var(--rs);
+  padding:9px 11px;font-size:11px;color:var(--red);margin-bottom:8px;line-height:1.6}
+.no-data{text-align:center;padding:28px 0;color:var(--t3);font-size:12px}
 </style>
 </head>
 <body>
@@ -352,386 +367,477 @@ body::before{content:'';position:fixed;inset:0;
 <!-- Loading -->
 <div id="loading">
   <div class="ld-logo">龍</div>
-  <div style="font-size:20px;font-weight:900">當沖圍中紅龍</div>
-  <div class="ld-sub">VER1.0 · DAYTRADING SYSTEM</div>
+  <div style="font-size:18px;font-weight:900">當沖圍中紅龍</div>
+  <div class="ld-sub">VER1.1 · DAYTRADING SYSTEM</div>
+  <div style="background:var(--rg);border:1px solid var(--bdrr);border-radius:6px;padding:4px 12px;font-size:10px;color:var(--red);font-weight:700">🎁 免費試用中</div>
   <div class="ld-bar"><div class="ld-fill"></div></div>
-  <div class="ld-msg" id="ldMsg">連線 TWSE 即時資料...</div>
+  <div class="ld-msg" id="ldMsg">初始化中...</div>
 </div>
 
 <div id="toast"></div>
 
 <div id="app">
-  <!-- Header -->
-  <div id="hdr">
-    <div class="logo">
-      <div class="logo-box">龍</div>
-      <div class="logo-txt">RED DRAGON <span style="font-size:9px;opacity:.7">VER1.0</span></div>
+<!-- Header -->
+<div id="hdr">
+  <div class="logo">
+    <div class="logo-box">龍</div>
+    <div class="logo-txt">當沖圍中紅龍<span class="ver-tag">VER1.1</span></div>
+  </div>
+  <div class="hdr-r">
+    <div class="trial-badge" id="trialBadge">🎁 試用中</div>
+    <div id="mktBadge" class="mkt-badge mkt-close">休市</div>
+    <div class="av-wrap" id="avWrap" onclick="switchPg('member',document.querySelector('.nav-btn:last-child'))" style="display:none">
+      <img id="avImg" src="" alt="">
     </div>
-    <div class="hdr-r">
-      <div id="mktBadge" class="mkt-badge mkt-close">休市</div>
-      <div class="av-wrap" id="avWrap" onclick="gotoMember()" style="display:none">
-        <img id="avImg" src="" alt="">
+  </div>
+</div>
+
+<!-- Main -->
+<div id="main">
+
+<!-- ═════ PAGE: 自選 ═════ -->
+<div class="pg on" id="pg-watch">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+    <div class="sec" style="margin:0">⭐ 我的自選股</div>
+    <button class="btn-sm" onclick="openAddStock()">＋ 新增</button>
+  </div>
+  <div id="watchContainer"><div class="loading-row"><div class="spin"></div><br>載入中...</div></div>
+</div>
+
+<!-- ═════ PAGE: 市場 ═════ -->
+<div class="pg" id="pg-market">
+  <div class="idx-box">
+    <div class="idx-lbl">加權指數 TAIEX</div>
+    <div class="idx-val" id="idxVal"><div class="spin"></div></div>
+    <div class="idx-chg neu" id="idxChg">-- </div>
+    <div class="idx-grid">
+      <div class="idx-cell"><div class="idx-cv up" id="idxUp">--</div><div class="idx-cl">上漲</div></div>
+      <div class="idx-cell"><div class="idx-cv dn" id="idxDn">--</div><div class="idx-cl">下跌</div></div>
+      <div class="idx-cell"><div class="idx-cv neu" id="idxVol">--</div><div class="idx-cl">成交(億)</div></div>
+    </div>
+  </div>
+  <div class="srch"><span>🔍</span><input type="text" id="mktSearch" placeholder="搜尋股票代號或名稱..." oninput="onSearch(this.value)"></div>
+  <div class="tabs" id="catTabs">
+    <div class="tab on" onclick="setCat(this,'all')">全部</div>
+    <div class="tab" onclick="setCat(this,'semi')">半導體</div>
+    <div class="tab" onclick="setCat(this,'ai')">AI概念</div>
+    <div class="tab" onclick="setCat(this,'ev')">電動車</div>
+    <div class="tab" onclick="setCat(this,'fin')">金融</div>
+    <div class="tab" onclick="setCat(this,'etf')">ETF</div>
+    <div class="tab" onclick="setCat(this,'day')">當沖熱門</div>
+  </div>
+  <div class="sec">即時報價</div>
+  <div id="mktList"><div class="loading-row"><div class="spin"></div><br>載入中...</div></div>
+</div>
+
+<!-- ═════ PAGE: 通知 ═════ -->
+<div class="pg" id="pg-notify">
+  <div class="sec">📡 新增價格通知</div>
+  <div class="card">
+    <div class="frow">
+      <div class="flbl">股票代號</div>
+      <input class="finp" id="nfCode" placeholder="例：2330" maxlength="6" oninput="this.value=this.value.toUpperCase()">
+    </div>
+    <div class="frow">
+      <div class="flbl">觸發價格（元）</div>
+      <input class="finp" type="number" id="nfPrice" placeholder="例：850" step="0.1">
+    </div>
+    <div class="frow">
+      <div class="flbl">觸發方向</div>
+      <div class="fradio">
+        <div class="frbtn" id="nfBuy" onclick="selNfType('buy')">📈 漲到買進</div>
+        <div class="frbtn" id="nfSell" onclick="selNfType('sell')">📉 跌到賣出</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="flbl">通知管道
+        <span id="notifyPlanHint" style="margin-left:6px;font-size:9px;color:var(--t3)">（方案決定可選管道）</span>
+      </div>
+      <div class="fradio">
+        <div class="frbtn" id="nfTg" onclick="selNfCh('telegram')">✈️ Telegram</div>
+        <div class="frbtn disabled" id="nfLine" onclick="selNfCh('line')">💬 LINE（年費）</div>
+        <div class="frbtn disabled" id="nfBoth" onclick="selNfCh('both')">🔔 雙送（年費）</div>
+      </div>
+    </div>
+    <button class="btn-red" onclick="addNotify()">＋ 加入通知</button>
+  </div>
+  <div class="sec">⚡ 通知列表</div>
+  <div id="nfList"><div class="no-data">尚無通知設定</div></div>
+</div>
+
+<!-- ═════ PAGE: 掃描 ═════ -->
+<div class="pg" id="pg-scan">
+  <div class="sec">🎯 自訂選股策略</div>
+  <div class="card">
+    <div style="font-size:11px;color:var(--t2);margin-bottom:8px">選擇篩選條件（可複選）</div>
+    <div class="sec" style="font-size:9px;margin:4px 0">籌碼面</div>
+    <div>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="投信連買3日">📊 投信連買</span>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="外資連買3日">🌍 外資連買</span>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="主力淨買超">🐋 主力買超</span>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="融券增加">📋 融券增</span>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="融資減少">📉 融資減</span>
+    </div>
+    <div class="sec" style="font-size:9px;margin:8px 0 4px">技術面</div>
+    <div>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="站上月線">📈 月線上</span>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="創20日新高">🚀 20日高</span>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="量增價漲">⚡ 量增漲</span>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="長紅K">🕯 長紅K</span>
+    </div>
+    <div class="sec" style="font-size:9px;margin:8px 0 4px">當沖條件</div>
+    <div>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="當沖比例高">🔥 當沖高</span>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="開盤爆量">💥 開盤爆</span>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="瞬間拉升">⬆️ 瞬間拉</span>
+      <span class="strat-chip" onclick="toggleChip(this)" data-k="軋空訊號">🎯 軋空</span>
+    </div>
+    <div style="display:flex;gap:7px;margin-top:10px">
+      <button class="btn-red" style="flex:1" onclick="runScan()">🔍 掃描</button>
+      <button class="btn-outline" style="width:40px;padding:0" onclick="clearChips()">✕</button>
+    </div>
+  </div>
+  <div class="sec">⭐ 快選策略</div>
+  <div class="scan-grid">
+    <div class="scan-opt on" id="scanMain" onclick="setScanMode(this,'主力異動')"><div class="so-ico">🐋</div><div class="so-nm">主力異動</div><div class="so-ds">法人大量進場</div></div>
+    <div class="scan-opt" id="scanRocket" onclick="setScanMode(this,'急速拉升')"><div class="so-ico">🚀</div><div class="so-nm">急速拉升</div><div class="so-ds">爆量短拉</div></div>
+    <div class="scan-opt" id="scanShort" onclick="setScanMode(this,'融券攻擊')"><div class="so-ico">🎯</div><div class="so-nm">融券攻擊</div><div class="so-ds">軋空訊號</div></div>
+    <div class="scan-opt" id="scanBreak" onclick="setScanMode(this,'量縮破底')"><div class="so-ico">⚠️</div><div class="so-nm">量縮破底</div><div class="so-ds">放空候選</div></div>
+  </div>
+  <div class="sec">📊 券商分點</div>
+  <div class="card">
+    <div style="display:flex;gap:7px">
+      <input class="finp" id="brokerCode" placeholder="股票代號" style="flex:1;margin:0">
+      <button class="btn-sm" onclick="loadBroker()">查詢</button>
+    </div>
+    <div id="brokerResult" style="margin-top:8px"></div>
+  </div>
+  <div class="sec">📡 訊號列表</div>
+  <div id="scanResults"><div class="loading-row"><div class="spin"></div><br>載入中...</div></div>
+</div>
+
+<!-- ═════ PAGE: 大盤 ═════ -->
+<div class="pg" id="pg-big">
+  <div class="tabs">
+    <div class="tab on" onclick="setBigTab(this,'台灣指數')">台灣指數</div>
+    <div class="tab" onclick="setBigTab(this,'三大法人')">三大法人</div>
+    <div class="tab" onclick="setBigTab(this,'融資融券')">融資融券</div>
+    <div class="tab" onclick="setBigTab(this,'產業排行')">產業排行</div>
+    <div class="tab" onclick="setBigTab(this,'當沖統計')">當沖統計</div>
+  </div>
+  <div id="bigContent"><div class="loading-row"><div class="spin"></div><br>載入中...</div></div>
+</div>
+
+<!-- ═════ PAGE: 會員 ═════ -->
+<div class="pg" id="pg-member">
+  <!-- 未登入 -->
+  <div id="memOut">
+    <div style="text-align:center;padding:20px 0 14px">
+      <div style="font-size:40px;margin-bottom:8px">🐉</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px">加入當沖圍中紅龍</div>
+      <div style="font-size:11px;color:var(--t2);margin-bottom:16px">使用LINE帳號登入，享受完整功能</div>
+      <div style="background:var(--gdg);border:1px solid rgba(255,215,0,.3);border-radius:8px;padding:8px 14px;font-size:11px;color:var(--gold);margin-bottom:14px">🎁 現在免費試用全功能！</div>
+    </div>
+    <button class="btn-line" onclick="doLogin()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+      使用 LINE 登入
+    </button>
+  </div>
+
+  <!-- 已登入 -->
+  <div id="memIn" style="display:none">
+    <div class="mem-card">
+      <img class="mem-av" id="memAv" src="" alt="">
+      <div class="mem-name" id="memName">--</div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px" id="memPhone">--</div>
+      <span class="plan-tag pt-free" id="memPlan">免費試用</span>
+    </div>
+
+    <!-- 補填手機（已登入後可補） -->
+    <div class="card" id="phoneCard" style="margin-bottom:7px;display:none">
+      <div class="flbl" style="margin-bottom:6px">📱 補填手機門號</div>
+      <div style="display:flex;gap:7px">
+        <input class="finp" id="phoneInput" placeholder="09xxxxxxxx" type="tel" style="flex:1;margin:0">
+        <button class="btn-sm" onclick="savePhone()">儲存</button>
+      </div>
+    </div>
+
+    <!-- Telegram -->
+    <div class="card" style="margin-bottom:7px">
+      <div class="flbl" style="margin-bottom:6px">✈️ 綁定 Telegram（輸入數字 User ID）</div>
+      <div style="display:flex;gap:7px">
+        <input class="finp" id="tgInput" placeholder="例：123456789" type="number" style="flex:1;margin:0">
+        <button class="btn-sm" onclick="saveTg()">儲存</button>
+      </div>
+      <div style="font-size:9px;color:var(--t3);margin-top:4px">在 Telegram 搜尋 @userinfobot 取得 User ID</div>
+    </div>
+
+    <!-- 當沖專屬功能 -->
+    <div class="sec">⚔️ 當沖專屬功能</div>
+    <div class="feat-grid" id="featGrid"></div>
+
+    <!-- 方案 -->
+    <div class="sec">🔥 升級方案</div>
+    <div class="plan-cards">
+      <div class="plan-card" onclick="showPay('月費',29)">
+        <div class="pl-nm">月費方案</div>
+        <div class="pl-pr">29</div>
+        <div class="pl-pd">元 / 月</div>
+        <div class="pl-ft">✓ Telegram通知<br>✓ 無限自選股<br>✓ 盤中掃描</div>
+        <button class="btn-red" style="margin-top:8px;font-size:11px;padding:8px">立即訂閱</button>
+      </div>
+      <div class="plan-card rec" onclick="showPay('年費',299)">
+        <div style="font-size:9px;color:var(--gold);font-weight:700;margin-bottom:2px">⭐ 最划算</div>
+        <div class="pl-nm">年費方案</div>
+        <div class="pl-pr" style="color:var(--gold)">299</div>
+        <div class="pl-pd">元 / 年</div>
+        <div class="pl-ft">✓ LINE+TG雙通知<br>✓ 優先客服<br>✓ 獨家K線指標</div>
+        <button class="btn-gold" style="margin-top:8px;font-size:11px;padding:8px">立即訂閱</button>
+      </div>
+    </div>
+    <button class="btn-outline" onclick="doLogout()">登出</button>
+  </div>
+
+  <!-- 管理員 -->
+  <div id="adminPanel" style="display:none;margin-top:10px">
+    <div class="adm-box">
+      <div class="adm-title">👑 管理員後台</div>
+      <div class="sec" style="margin-top:0">會員列表</div>
+      <div style="overflow-x:auto">
+        <table class="tbl" id="memTbl">
+          <thead><tr><th>名稱</th><th>手機</th><th>方案</th><th>到期</th><th>狀態</th><th>操作</th></tr></thead>
+          <tbody id="memTblBody"><tr><td colspan="6" style="text-align:center;padding:10px"><div class="spin"></div></td></tr></tbody>
+        </table>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Main -->
-  <div id="main">
+</div><!-- /main -->
 
-    <!-- ═══ PAGE: 自選 ═══ -->
-    <div class="pg on" id="pg-watch">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div class="sec-lbl" style="margin:0">⭐ 我的自選</div>
-        <button class="btn-sm" onclick="openAddStock()">＋ 新增</button>
-      </div>
-      <div id="watchContainer"><div class="no-data"><div class="spin"></div><br>載入中...</div></div>
-    </div>
-
-    <!-- ═══ PAGE: 市場 ═══ -->
-    <div class="pg" id="pg-market">
-      <!-- 大盤 -->
-      <div class="idx-box" id="idxBox">
-        <div class="idx-lbl">加權指數 TAIEX</div>
-        <div class="idx-val" id="idxVal"><div class="spin"></div></div>
-        <div class="idx-chg" id="idxChg">--</div>
-        <div class="idx-grid">
-          <div class="idx-cell"><div class="idx-cell-v" id="idxUp">--</div><div class="idx-cell-l">上漲</div></div>
-          <div class="idx-cell"><div class="idx-cell-v" id="idxDn">--</div><div class="idx-cell-l">下跌</div></div>
-          <div class="idx-cell"><div class="idx-cell-v" id="idxVol">--</div><div class="idx-cell-l">成交額</div></div>
-        </div>
-      </div>
-      <div class="srch">
-        <span>🔍</span>
-        <input type="text" id="mktSearch" placeholder="搜尋股票代號或名稱..." oninput="onSearch(this.value)">
-      </div>
-      <div class="tabs" id="catTabs">
-        <div class="tab on" onclick="setCat(this,'all')">全部</div>
-        <div class="tab" onclick="setCat(this,'semi')">半導體</div>
-        <div class="tab" onclick="setCat(this,'ai')">AI概念</div>
-        <div class="tab" onclick="setCat(this,'ev')">電動車</div>
-        <div class="tab" onclick="setCat(this,'fin')">金融</div>
-        <div class="tab" onclick="setCat(this,'etf')">ETF</div>
-        <div class="tab" onclick="setCat(this,'day')">當沖熱門</div>
-      </div>
-      <div class="sec-lbl">即時報價</div>
-      <div id="mktList"><div class="no-data"><div class="spin"></div><br>載入中...</div></div>
-    </div>
-
-    <!-- ═══ PAGE: 通知 ═══ -->
-    <div class="pg" id="pg-notify">
-      <div class="sec-lbl">📡 新增價格通知</div>
-      <div class="card">
-        <div class="frow">
-          <div class="flbl">股票代號</div>
-          <input class="finp" id="nfCode" placeholder="例：2330" maxlength="6" oninput="this.value=this.value.toUpperCase()">
-        </div>
-        <div class="frow">
-          <div class="flbl">觸發價格（元）</div>
-          <input class="finp" type="number" id="nfPrice" placeholder="例：850" step="0.1">
-        </div>
-        <div class="frow">
-          <div class="flbl">觸發方向</div>
-          <div class="fradio">
-            <div class="frbtn" id="nfBuy" onclick="selNfType('buy')">📈 漲到買進</div>
-            <div class="frbtn" id="nfSell" onclick="selNfType('sell')">📉 跌到賣出</div>
-          </div>
-        </div>
-        <div class="frow">
-          <div class="flbl">通知管道</div>
-          <div class="fradio">
-            <div class="frbtn" id="nfLine" onclick="selNfCh('line')" style="flex:none;width:48%">💬 LINE</div>
-            <div class="frbtn" id="nfTg" onclick="selNfCh('telegram')" style="flex:none;width:48%">✈️ Telegram</div>
-          </div>
-        </div>
-        <button class="btn-red" onclick="addNotify()">＋ 加入通知</button>
-      </div>
-      <div class="sec-lbl">⚡ 通知列表</div>
-      <div id="nfList"><div class="no-data">尚無通知設定</div></div>
-    </div>
-
-    <!-- ═══ PAGE: 當沖掃描（籌碼策略） ═══ -->
-    <div class="pg" id="pg-scan">
-      <div class="sec-lbl">🎯 自訂選股策略</div>
-      <div class="card">
-        <div style="font-size:12px;color:var(--t2);margin-bottom:10px">選擇篩選條件（可複選）</div>
-        <!-- 籌碼面 -->
-        <div class="sec-lbl" style="font-size:9px;margin:6px 0 6px">籌碼面</div>
-        <div>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="投信連買3日">📊 投信連買3日</span>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="外資連買3日">🌍 外資連買3日</span>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="主力淨買超">🐋 主力淨買超</span>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="融券增加">📋 融券增加</span>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="融資減少">📉 融資減少</span>
-        </div>
-        <!-- 技術面 -->
-        <div class="sec-lbl" style="font-size:9px;margin:10px 0 6px">技術面</div>
-        <div>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="站上月線">📈 站上月線</span>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="創20日新高">🚀 創20日新高</span>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="量增價漲">⚡ 量增價漲</span>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="長紅K">🕯 長紅K</span>
-        </div>
-        <!-- 當沖面 -->
-        <div class="sec-lbl" style="font-size:9px;margin:10px 0 6px">當沖條件</div>
-        <div>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="當沖比例高">🔥 當沖比例高</span>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="開盤爆量">💥 開盤爆量</span>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="瞬間拉升">⬆️ 瞬間拉升</span>
-          <span class="strat-chip" onclick="toggleChip(this)" data-k="軋空訊號">🎯 軋空訊號</span>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn-red" style="flex:1" onclick="runScan()">🔍 開始掃描</button>
-          <button class="btn-outline" style="width:44px" onclick="clearChips()">✕</button>
-        </div>
-      </div>
-
-      <!-- 官方策略 -->
-      <div class="sec-lbl">⭐ 快選策略</div>
-      <div class="scan-grid">
-        <div class="scan-opt on" id="scanMain" onclick="setScanMode(this,'主力異動')">
-          <div class="so-ico">🐋</div><div class="so-nm">主力異動</div><div class="so-ds">法人大量進場</div>
-        </div>
-        <div class="scan-opt" id="scanRocket" onclick="setScanMode(this,'急速拉升')">
-          <div class="so-ico">🚀</div><div class="so-nm">急速拉升</div><div class="so-ds">爆量短拉</div>
-        </div>
-        <div class="scan-opt" id="scanShort" onclick="setScanMode(this,'融券攻擊')">
-          <div class="so-ico">🎯</div><div class="so-nm">融券攻擊</div><div class="so-ds">軋空訊號</div>
-        </div>
-        <div class="scan-opt" id="scanBreak" onclick="setScanMode(this,'量縮破底')">
-          <div class="so-ico">⚠️</div><div class="so-nm">量縮破底</div><div class="so-ds">放空候選</div>
-        </div>
-      </div>
-
-      <div class="sec-lbl">📊 券商分點追蹤</div>
-      <div class="card">
-        <div style="display:flex;gap:8px">
-          <input class="finp" id="brokerCode" placeholder="輸入股票代號" style="flex:1;margin:0">
-          <button class="btn-sm" onclick="loadBroker()">查詢</button>
-        </div>
-        <div id="brokerResult" style="margin-top:10px"></div>
-      </div>
-
-      <div class="sec-lbl">⚡ 訊號列表</div>
-      <div id="scanResults"><div class="no-data"><div class="spin"></div><br>載入 TWSE 資料...</div></div>
-    </div>
-
-    <!-- ═══ PAGE: 大盤 ═══ -->
-    <div class="pg" id="pg-big">
-      <div class="chip-tabs">
-        <div class="chtab on" onclick="setBigTab(this,'台灣指數')">台灣指數</div>
-        <div class="chtab" onclick="setBigTab(this,'三大法人')">三大法人</div>
-        <div class="chtab" onclick="setBigTab(this,'融資融券')">融資融券</div>
-        <div class="chtab" onclick="setBigTab(this,'產業排行')">產業排行</div>
-        <div class="chtab" onclick="setBigTab(this,'當沖統計')">當沖統計</div>
-      </div>
-      <div id="bigContent"><div class="no-data"><div class="spin"></div><br>載入中...</div></div>
-    </div>
-
-    <!-- ═══ PAGE: 會員 ═══ -->
-    <div class="pg" id="pg-member">
-      <!-- 未登入 -->
-      <div id="memOut">
-        <div style="text-align:center;padding:24px 0 16px">
-          <div style="font-size:44px;margin-bottom:10px">🐉</div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:5px">加入當沖圍中紅龍</div>
-          <div style="font-size:12px;color:var(--t2);margin-bottom:20px">使用LINE帳號登入，啟用即時股價通知</div>
-        </div>
-        
-        <button class="btn-line" onclick="doLogin()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-          使用 LINE 登入
-        </button>
-      </div>
-
-      <!-- 已登入 -->
-      <div id="memIn" style="display:none">
-        <div class="mem-card">
-          <img class="mem-av" id="memAv" src="" alt="">
-          <div class="mem-name" id="memName">--</div>
-          <div style="font-size:11px;color:var(--t3);margin-top:3px" id="memSub">LINE 會員</div>
-          <span class="plan-tag pt-free" id="memPlan">免費會員</span>
-        </div>
-
-        <!-- Telegram -->
-        <div class="card" style="margin-bottom:8px">
-          <div class="flbl" style="margin-bottom:7px">✈️ 綁定 Telegram（輸入 User ID 數字）</div>
-          <div style="display:flex;gap:8px">
-            <input class="finp" id="tgInput" placeholder="Telegram User ID" type="number" style="flex:1;margin:0">
-            <button class="btn-sm" onclick="saveTg()">儲存</button>
-          </div>
-          <div style="font-size:10px;color:var(--t3);margin-top:5px">在 Telegram 搜尋 @userinfobot 可查詢你的 User ID</div>
-        </div>
-
-        <!-- 訂閱 -->
-        <div class="sec-lbl">🔥 升級方案</div>
-        <div class="plan-grid">
-          <div class="plan-card" onclick="showPay('月費',299)">
-            <div class="pl-nm">月費方案</div>
-            <div class="pl-pr">299</div>
-            <div class="pl-pd">元 / 月</div>
-            <div class="pl-ft">✓ 全功能解鎖<br>✓ LINE即時推播<br>✓ 無限自選股</div>
-            <button class="btn-red" style="margin-top:10px;font-size:12px;padding:9px">立即訂閱</button>
-          </div>
-          <div class="plan-card rec" onclick="showPay('年費',2499)">
-            <div style="font-size:9px;color:var(--gold);font-weight:700;margin-bottom:3px">⭐ 最划算</div>
-            <div class="pl-nm">年費方案</div>
-            <div class="pl-pr" style="color:var(--gold)">2499</div>
-            <div class="pl-pd">元 / 年</div>
-            <div class="pl-ft">✓ 全功能解鎖<br>✓ 優先客服<br>✓ 獨家指標</div>
-            <button class="btn-red" style="margin-top:10px;font-size:12px;padding:9px;background:linear-gradient(135deg,var(--gold),#ff8c00);color:#000">立即訂閱</button>
-          </div>
-        </div>
-
-        <button class="btn-outline" onclick="doLogout()" style="margin-top:4px">登出</button>
-      </div>
-
-      <!-- 管理員 -->
-      <div id="adminPanel" style="display:none;margin-top:12px">
-        <div class="adm-box">
-          <div class="adm-title">👑 管理員後台</div>
-          <div style="overflow-x:auto">
-            <table class="tbl" id="memTbl">
-              <thead><tr><th>名稱</th><th>方案</th><th>到期</th><th>狀態</th></tr></thead>
-              <tbody id="memTblBody"><tr><td colspan="4" style="text-align:center;padding:12px"><div class="spin"></div></td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /main -->
-
-  <!-- Nav -->
-  <nav id="nav">
-    <button class="nav-btn on" onclick="switchPg('watch',this)"><span class="nav-ico">⭐</span><span class="nav-lbl">自選</span></button>
-    <button class="nav-btn" onclick="switchPg('market',this)"><span class="nav-ico">📊</span><span class="nav-lbl">市場</span></button>
-    <button class="nav-btn" onclick="switchPg('notify',this)"><span class="nav-ico">🔔</span><span class="nav-lbl">通知</span></button>
-    <button class="nav-btn" onclick="switchPg('scan',this)"><span class="nav-ico">🔭</span><span class="nav-lbl">掃描</span></button>
-    <button class="nav-btn" onclick="switchPg('big',this)"><span class="nav-ico">🏛</span><span class="nav-lbl">大盤</span></button>
-    <button class="nav-btn" onclick="switchPg('member',this)"><span class="nav-ico">👤</span><span class="nav-lbl">會員</span></button>
-  </nav>
+<!-- Nav -->
+<nav id="nav">
+  <button class="nav-btn on" onclick="switchPg('watch',this)"><span class="nav-ico">⭐</span><span class="nav-lbl">自選</span></button>
+  <button class="nav-btn" onclick="switchPg('market',this)"><span class="nav-ico">📊</span><span class="nav-lbl">市場</span></button>
+  <button class="nav-btn" onclick="switchPg('notify',this)"><span class="nav-ico">🔔</span><span class="nav-lbl">通知</span></button>
+  <button class="nav-btn" onclick="switchPg('scan',this)"><span class="nav-ico">🔭</span><span class="nav-lbl">掃描</span></button>
+  <button class="nav-btn" onclick="switchPg('big',this)"><span class="nav-ico">🏛</span><span class="nav-lbl">大盤</span></button>
+  <button class="nav-btn" onclick="switchPg('member',this)"><span class="nav-ico">👤</span><span class="nav-lbl">會員</span></button>
+</nav>
 </div><!-- /app -->
 
 <!-- ═══ MODALS ═══ -->
 
-<!-- Add Stock -->
+<!-- 新增/編輯自選股 -->
 <div class="ov" id="ovAdd" onclick="closeOv(event,'ovAdd')">
   <div class="mdl" style="position:relative">
     <div class="mdl-hnd"></div>
-    <button class="mdl-close" onclick="closeOvId('ovAdd')">✕</button>
-    <div class="mdl-title">➕ 新增自選股</div>
-    <input class="finp" id="addInput" placeholder="輸入股票代號（例：2330）" maxlength="6" style="margin-bottom:10px">
-    <button class="btn-red" onclick="confirmAdd()">確認新增</button>
+    <button class="mdl-x" onclick="closeOvId('ovAdd')">✕</button>
+    <div class="mdl-title" id="addTitle">➕ 新增自選股</div>
+    <div class="frow">
+      <div class="flbl">股票代號</div>
+      <input class="finp" id="addCode" placeholder="例：2330" maxlength="6" oninput="this.value=this.value.toUpperCase();lookupName(this.value)">
+    </div>
+    <div style="font-size:12px;color:var(--gold);min-height:18px;margin-bottom:8px" id="addNamePreview"></div>
+    <button class="btn-red" onclick="confirmAdd()">確認</button>
   </div>
 </div>
 
-<!-- Core func -->
+<!-- K 線 / 核心功能 -->
 <div class="ov" id="ovCore" onclick="closeOv(event,'ovCore')">
   <div class="mdl" style="position:relative">
     <div class="mdl-hnd"></div>
-    <button class="mdl-close" onclick="closeOvId('ovCore')">✕</button>
-    <div class="mdl-title" id="coreTitle">📊 股票分析</div>
-    <div class="chip-tabs" id="coreTabs">
-      <div class="chtab on" onclick="setCoreTab(this,'主力進出')">主力進出</div>
-      <div class="chtab" onclick="setCoreTab(this,'大戶分析')">大戶分析</div>
-      <div class="chtab" onclick="setCoreTab(this,'融資融券')">融資融券</div>
-      <div class="chtab" onclick="setCoreTab(this,'當沖資訊')">當沖資訊</div>
-      <div class="chtab" onclick="setCoreTab(this,'關鍵分點')">關鍵分點</div>
+    <button class="mdl-x" onclick="closeOvId('ovCore')">✕</button>
+    <div class="kline-wrap" style="margin:0 0 10px;padding:10px">
+      <div class="kline-hdr">
+        <div>
+          <div class="kline-name" id="klineName">--</div>
+          <div style="font-size:10px;color:var(--t3)" id="klineCode">--</div>
+        </div>
+        <div style="text-align:right">
+          <div class="sc-pv up" id="klinePrice">--</div>
+          <div class="sc-chg" id="klineChg">--</div>
+        </div>
+      </div>
+      <div class="kline-tabs">
+        <div class="kline-tab on" onclick="setKlineType(this,'candle')">K線</div>
+        <div class="kline-tab" onclick="setKlineType(this,'line')">折線</div>
+        <div class="kline-tab" onclick="setKlineType(this,'vol')">量能</div>
+      </div>
+      <div class="kline-canvas-wrap">
+        <canvas id="klineChart"></canvas>
+      </div>
+      <!-- 當沖關鍵指標 -->
+      <div class="dt-stats">
+        <div class="dt-stat"><div class="dt-stat-v up" id="kDtBuyPow">--</div><div class="dt-stat-l">買盤強度</div></div>
+        <div class="dt-stat"><div class="dt-stat-v" id="kDtVol">--</div><div class="dt-stat-l">成交量(張)</div></div>
+        <div class="dt-stat"><div class="dt-stat-v dn" id="kDtSellPow">--</div><div class="dt-stat-l">賣壓強度</div></div>
+      </div>
     </div>
-    <div id="coreContent"><div class="no-data"><div class="spin"></div></div></div>
+    <!-- 分析 tabs -->
+    <div class="tabs" id="coreTabs" style="margin-bottom:8px">
+      <div class="tab on" onclick="setCoreTab(this,'主力進出')">主力進出</div>
+      <div class="tab" onclick="setCoreTab(this,'大戶分析')">大戶分析</div>
+      <div class="tab" onclick="setCoreTab(this,'融資融券')">融資融券</div>
+      <div class="tab" onclick="setCoreTab(this,'當沖資訊')">當沖資訊</div>
+      <div class="tab" onclick="setCoreTab(this,'關鍵分點')">關鍵分點</div>
+    </div>
+    <div id="coreContent"><div class="loading-row"><div class="spin"></div></div></div>
   </div>
 </div>
 
-<!-- Pay -->
+<!-- 付款 -->
 <div class="ov" id="ovPay" onclick="closeOv(event,'ovPay')">
   <div class="mdl" style="position:relative">
     <div class="mdl-hnd"></div>
-    <button class="mdl-close" onclick="closeOvId('ovPay')">✕</button>
+    <button class="mdl-x" onclick="closeOvId('ovPay')">✕</button>
     <div class="mdl-title" id="payTitle">💳 訂閱付款</div>
-    <div style="text-align:center;padding:14px 0 18px">
-      <div style="font-size:28px;margin-bottom:6px">💳</div>
-      <div style="font-size:13px;color:var(--t2);margin-bottom:14px">選擇付款方式</div>
-      <button class="btn-red" style="margin-bottom:8px" onclick="processPay('LINE Pay')">💚 LINE Pay</button>
-      <button class="btn-red" style="margin-bottom:8px;background:linear-gradient(135deg,#1a73e8,#0f52ba)" onclick="processPay('信用卡')">💳 信用卡</button>
+    <div style="text-align:center;padding:10px 0 14px">
+      <button class="btn-red" style="margin-bottom:7px" onclick="processPay('LINE Pay')">💚 LINE Pay</button>
+      <button class="btn-red" style="margin-bottom:7px;background:linear-gradient(135deg,#1a73e8,#0f52ba)" onclick="processPay('信用卡')">💳 信用卡</button>
       <button class="btn-red" style="background:linear-gradient(135deg,#ff6600,#cc4400)" onclick="processPay('ATM')">🏦 ATM轉帳</button>
     </div>
   </div>
 </div>
 
+<!-- 管理員設定方案 -->
+<div class="ov" id="ovAdminPlan" onclick="closeOv(event,'ovAdminPlan')">
+  <div class="mdl" style="position:relative">
+    <div class="mdl-hnd"></div>
+    <button class="mdl-x" onclick="closeOvId('ovAdminPlan')">✕</button>
+    <div class="mdl-title">👑 設定會員方案</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:10px" id="adminTargetName">--</div>
+    <div class="frow">
+      <div class="flbl">方案</div>
+      <div class="fradio">
+        <div class="frbtn" id="ap-monthly" onclick="selAdminPlan('monthly')">月費</div>
+        <div class="frbtn" id="ap-yearly" onclick="selAdminPlan('yearly')">年費</div>
+        <div class="frbtn" id="ap-free" onclick="selAdminPlan('free')">停用</div>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="flbl">到期日</div>
+      <input class="finp" id="apExpiry" type="date">
+    </div>
+    <button class="btn-red" onclick="confirmAdminPlan()">確認設定</button>
+  </div>
+</div>
+
+<!-- 偏好設定（優先載入） -->
+<div class="ov" id="ovPref" onclick="">
+  <div class="mdl" style="position:relative">
+    <div class="mdl-hnd"></div>
+    <div class="mdl-title">⚙️ 優先載入設定</div>
+    <div style="font-size:11px;color:var(--t2);margin-bottom:10px">勾選開啟後，進入該頁面會自動立即載入資料</div>
+    <div id="prefList"></div>
+    <button class="btn-red" style="margin-top:12px" onclick="savePref()">儲存設定</button>
+  </div>
+</div>
+
+<!-- 註冊補填資料 -->
+<div class="ov" id="ovRegister" onclick="">
+  <div class="mdl" style="position:relative">
+    <div class="mdl-hnd"></div>
+    <div class="mdl-title">📝 完善會員資料</div>
+    <div style="font-size:11px;color:var(--t2);margin-bottom:12px">請填寫以下資料，以便接收重要通知</div>
+    <div class="frow">
+      <div class="flbl">手機門號 *</div>
+      <input class="finp" id="regPhone" placeholder="09xxxxxxxx" type="tel" maxlength="10">
+    </div>
+    <div class="frow">
+      <div class="flbl">暱稱</div>
+      <input class="finp" id="regName" placeholder="您的暱稱">
+    </div>
+    <button class="btn-red" onclick="submitRegister()">完成註冊</button>
+    <button class="btn-outline" style="margin-top:6px" onclick="closeOvId('ovRegister')">稍後填寫</button>
+  </div>
+</div>
+
 <script>
 'use strict';
-// ═══════════════════════════════════════════
-//  ★ CONFIG — 請修改這兩個值
-// ═══════════════════════════════════════════
-const CONFIG = {
-  LIFF_ID:  '2009624678-jXtdZr3P',
-  GAS_URL:  'https://script.google.com/macros/s/AKfycbwMmwtiqanCJZB7-S_v73DhYyEQyV5e4HQof7nL1WPcTeSQ3SzlDB0Fojbf_QMqb2tY/exec',
-  ADMIN_PHONE: '0937942582',
+// ═══════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════
+const C = {
+  LIFF_ID:     '2009624678-jXtdZr3P',
+  GAS_URL:     'https://script.google.com/macros/s/AKfycbwMmwtiqanCJZB7-S_v73DhYyEQyV5e4HQof7nL1WPcTeSQ3SzlDB0Fojbf_QMqb2tY/exec',
+  ADMIN_ID:    'U17769ba957e37cc8e63105a37b7388c5',
+  VERSION:     'VER1.1',
 };
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════
 const S = {
-  user: null, isLoggedIn: false, isAdmin: false,
-  watchlist: [],
-  notifications: [],
-  scanChips: [],
-  scanMode: '主力異動',
-  notifyType: null, notifyChannel: null,
-  selectedPlan: null, selectedPlanAmt: 0,
-  currentStock: null,
-  currentCoreTab: '主力進出',
-  bigTab: '台灣指數',
-  priceCache: {},       // code → {price,change,pct,...,ts}
-  indexData: null,
+  user:null, isLoggedIn:false, isAdmin:false, freeTrial:true,
+  watchlist:[], notifyType:null, notifyChannel:null,
+  scanMode:'主力異動', scanChips:[],
+  selectedPlan:null, selectedPlanAmt:0,
+  currentStock:null,
+  priceCache:{},  // code→priceObj
+  nameCache:{},   // code→name
+  bigTab:'台灣指數',
+  klineChart:null, klineType:'candle',
+  adminTarget:null, adminPlan:null,
+  pref:{},  // {watch:true, market:false, scan:false, big:false}
 };
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════
 //  INIT
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════
 window.addEventListener('load', async () => {
-  ldMsg('初始化 LIFF...');
-  // 隱藏 LIFF guide if configured
-  
+  ldMsg('初始化中...');
 
-  // Load local state
+  // 偏好設定
+  S.pref = JSON.parse(localStorage.getItem('rdPref') || '{"watch":true,"market":false,"scan":false,"big":false}');
   S.watchlist = JSON.parse(localStorage.getItem('rdWatch') || '["2330","2454","0050","2317","2308"]');
-  S.notifications = JSON.parse(localStorage.getItem('rdNotify') || '[]');
+  S.notifyList = JSON.parse(localStorage.getItem('rdNotify') || '[]');
+  S.nameCache  = JSON.parse(localStorage.getItem('rdNames') || '{}');
 
-  // Init LIFF
+  // LIFF init
+  ldMsg('連線 LINE LIFF...');
   try {
-    await liff.init({ liffId: CONFIG.LIFF_ID });
+    await liff.init({ liffId: C.LIFF_ID });
     if (liff.isLoggedIn()) {
-      ldMsg('取得 LINE 用戶資料...');
+      ldMsg('取得 LINE 資料...');
       const profile = await liff.getProfile();
       await processLogin(profile);
     }
-  } catch(e) {
-    console.warn('LIFF init failed:', e.message);
-  }
+  } catch(e) { console.warn('LIFF:', e.message); }
 
-  // Try restore local login
+  // 嘗試恢復本機登入
   const stored = localStorage.getItem('rdUser');
-  if (stored && !S.isLoggedIn) {
-    const u = JSON.parse(stored);
-    setLoggedIn(u);
+  if (stored && !S.isLoggedIn) setLoggedIn(JSON.parse(stored));
+
+  checkMarket();
+  updateNotifyChannelUI();
+
+  // ★ 優先載入（用戶選擇的頁面）
+  if (S.pref.watch !== false) {
+    ldMsg('取得自選股報價...');
+    await loadWatchlist();
+  } else {
+    document.getElementById('watchContainer').innerHTML =
+      '<div class="no-data">點擊下方 ⭐ 切換到自選股即可載入</div>';
   }
 
-  ldMsg('連線 TWSE 取得大盤資料...');
-  checkMarket();
-  await loadIndex();
-  await loadWatchlist();
-  await loadMarket();
-
-  // Hide loading
+  // 隱藏 loading
   setTimeout(() => {
     const ld = document.getElementById('loading');
     ld.style.opacity = '0';
-    setTimeout(() => ld.style.display = 'none', 400);
-  }, 600);
+    setTimeout(() => ld.style.display='none', 400);
+  }, 300);
 
-  // Auto-refresh every 30s during market hours
+  // 其餘延遲載入
+  setTimeout(() => {
+    if (S.pref.market) loadIndex();
+    if (S.pref.scan)   loadScanByMode('主力異動');
+    if (S.pref.big)    loadBigTab('台灣指數');
+    renderNotifyList();
+    renderFeatGrid();
+  }, 500);
+
+  // 自動刷新（開市中每30秒）
   setInterval(autoRefresh, 30000);
 });
 
@@ -739,14 +845,13 @@ function ldMsg(m) { document.getElementById('ldMsg').textContent = m; }
 
 function checkMarket() {
   const now = new Date();
-  const h = now.getHours(), m = now.getMinutes();
-  const open = (h > 9 || (h === 9 && m >= 0)) && (h < 13 || (h === 13 && m <= 30));
-  const d = now.getDay();
-  const isOpen = open && d >= 1 && d <= 5;
-  const badge = document.getElementById('mktBadge');
-  badge.textContent = isOpen ? '開市中' : '休市';
-  badge.className = 'mkt-badge ' + (isOpen ? 'mkt-open' : 'mkt-close');
-  return isOpen;
+  const tw  = new Date(now.toLocaleString('en-US',{timeZone:'Asia/Taipei'}));
+  const h=tw.getHours(), m=tw.getMinutes(), d=tw.getDay();
+  const open = d>=1&&d<=5 && (h>9||(h===9&&m>=0)) && (h<13||(h===13&&m<=30));
+  const b = document.getElementById('mktBadge');
+  b.textContent = open ? '開市中' : (d===0||d===6 ? '週末' : '休市');
+  b.className = 'mkt-badge ' + (open ? 'mkt-open' : 'mkt-close');
+  return open;
 }
 
 async function autoRefresh() {
@@ -755,132 +860,80 @@ async function autoRefresh() {
   if (document.getElementById('pg-market').classList.contains('on')) await loadMarket();
 }
 
-// ═══════════════════════════════════════════
-//  GAS API — 改善錯誤處理與 CORS 相容
-// ═══════════════════════════════════════════
-async function gas(action, data = {}) {
+// ═══════════════════════════════════
+//  GAS 呼叫（text/plain 避免 CORS preflight）
+// ═══════════════════════════════════
+async function gas(action, data={}) {
   try {
-    // 用 GET 方式避免 CORS preflight 問題（GAS 不支援 OPTIONS）
-    const params = new URLSearchParams({ action, ...Object.fromEntries(
-      Object.entries(data).map(([k,v]) => [k, typeof v === 'object' ? JSON.stringify(v) : v])
-    )}).toString();
-    // 先試 POST（帶完整資料），失敗才改 GET
-    let res, json;
-    try {
-      res = await fetch(CONFIG.GAS_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action, ...data }),
-        headers: { 'Content-Type': 'text/plain' }, // 避免 CORS preflight
-      });
-      const text = await res.text();
-      json = JSON.parse(text);
-    } catch(postErr) {
-      // Fallback: GET
-      res  = await fetch(CONFIG.GAS_URL + '?' + params);
-      const text = await res.text();
-      json = JSON.parse(text);
-    }
-    if (!json) return null;
-    // 記錄 GAS 錯誤到 console（方便 debug）
-    if (!json.ok) console.warn('[GAS]', action, json.error || json);
+    const body = JSON.stringify({action,...data});
+    const res  = await fetch(C.GAS_URL, {
+      method:'POST', body, headers:{'Content-Type':'text/plain'},
+    });
+    const text = await res.text();
+    const json = JSON.parse(text);
+    if (!json.ok) console.warn('[GAS]',action,json.error);
     return json;
   } catch(e) {
-    console.error('[GAS ERROR]', action, e.message);
-    return null;
-  }
-}
-
-// ═══════════════════════════════════════════
-//  INDEX DATA (TWSE via GAS proxy)
-// ═══════════════════════════════════════════
-async function loadIndex() {
-  try {
-    const r = await gas('getIndex');
-    if (!r?.ok) return;
-    S.indexData = r;
-    renderIndex(r);
-  } catch(e) {}
-}
-
-function renderIndex(r) {
-  if (!r?.ok) return;
-  // TWSE exchangeReport/MI_INDEX (type=MS) 回傳格式：
-  // stat:'OK', data:[['發行量加權股價指數','22847.00','▲123.45','▲0.54%',...]]
-  const taiex = r?.taiex;
-  if (taiex?.stat === 'OK' && taiex?.data?.length) {
-    const row    = taiex.data.find(d => (d[0]||'').includes('加權')) || taiex.data[0];
-    if (row) {
-      const val    = parseFloat(String(row[1]||'0').replace(/,/g,''));
-      const chgStr = String(row[2] || '');
-      const chgVal = parseFloat(chgStr.replace(/[▲▼+\-,\s]/g,'')) || 0;
-      const isUp   = chgStr.includes('▲') || chgStr.startsWith('+');
-      const pctStr = String(row[3]||'');
-      const pct    = parseFloat(pctStr.replace(/[▲▼+\-,%\s]/g,'')) || 0;
-      if (!isNaN(val) && val > 0) {
-        document.getElementById('idxVal').textContent = val.toLocaleString();
-        document.getElementById('idxChg').textContent = (isUp?'▲ +':'▼ ') + Math.abs(chgVal).toFixed(2) + ' (' + Math.abs(pct).toFixed(2) + '%)';
-        document.getElementById('idxChg').className   = 'idx-chg ' + (isUp ? 'up' : 'dn');
-      }
+    // fallback GET
+    try {
+      const params = Object.entries({action,...data})
+        .map(([k,v])=>k+'='+encodeURIComponent(typeof v==='object'?JSON.stringify(v):v))
+        .join('&');
+      const res  = await fetch(C.GAS_URL+'?'+params);
+      return await res.json();
+    } catch(e2) {
+      console.error('[GAS ERR]',action,e2.message);
+      return null;
     }
   }
-  // 上漲/下跌家數
-  const cats = r?.categories;
-  if (cats?.stat === 'OK' && cats?.data?.length) {
-    let up = 0, dn = 0;
-    cats.data.forEach(row => {
-      const c2 = String(row[2]||'');
-      if (c2.includes('▲') || parseFloat(c2)>0) up++; else if(c2.includes('▼') || parseFloat(c2)<0) dn++;
-    });
-    if (up) document.getElementById('idxUp').textContent = up;
-    if (dn) document.getElementById('idxDn').textContent = dn;
-  }
 }
 
-// ═══════════════════════════════════════════
-//  WATCHLIST
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════
+//  自選股
+// ═══════════════════════════════════
 async function loadWatchlist() {
   const c = document.getElementById('watchContainer');
-  if (S.watchlist.length === 0) {
+  if (!S.watchlist.length) {
     c.innerHTML = '<div class="no-data">尚無自選股，點擊＋新增</div>'; return;
   }
-  c.innerHTML = '<div class="no-data"><div class="spin"></div><br>取得 TWSE 即時報價...</div>';
-  try {
-    const r = await gas('getPrices', { codes: S.watchlist });
-    if (r?.ok && r.prices?.length) {
-      r.prices.forEach(p => { if(p.code) S.priceCache[p.code] = p; });
-      renderWatchlist(r.prices);
-      if (r.failed?.length) toast(`⚠️ 部分代號查無資料：${r.failed.join(',')}`);
-    } else {
-      // 顯示代號但無報價
-      renderWatchlist(S.watchlist.map(code => ({ code, name: code, price: 0, change: 0, pct: 0, ok: false })));
-      const errMsg = r?.error || '無法取得 TWSE 資料';
-      c.insertAdjacentHTML('afterbegin', `<div class="err-banner">⚠️ ${errMsg}<br><small>請確認 GAS 已重新部署（新版本）</small></div>`);
-    }
-  } catch(e) {
-    renderWatchlist(S.watchlist.map(code => ({ code, name: code, price: 0, change: 0, pct: 0, ok: false })));
-    toast('⚠️ 連線失敗：' + e.message);
+  const r = await gas('getPrices',{codes:S.watchlist});
+  if (r?.ok && r.prices?.length) {
+    r.prices.forEach(p => {
+      S.priceCache[p.code] = p;
+      if (p.name) { S.nameCache[p.code]=p.name; localStorage.setItem('rdNames',JSON.stringify(S.nameCache)); }
+    });
+    renderWatchlist(r.prices);
+    if (r.isWeekend) toast('📅 週末顯示週五收盤資料');
+  } else {
+    renderWatchlist(S.watchlist.map(c=>({code:c,name:S.nameCache[c]||c,price:0,change:0,pct:0,ok:false})));
+    if (r?.failed?.length) toast(`部分資料無法取得：${r.failed.slice(0,3).join(',')}`);
+    else if (!r) c.insertAdjacentHTML('afterbegin','<div class="err-banner">⚠️ TWSE 連線失敗，請稍後再試</div>');
   }
 }
 
 function renderWatchlist(prices) {
   const c = document.getElementById('watchContainer');
-  c.innerHTML = S.watchlist.map(code => {
-    const p = prices.find(x => x.code === code) || { code, name: code, price: 0, change: 0, pct: 0, ok: false };
-    const up = p.change >= 0;
-    const cls = up ? 'up-c' : 'dn-c';
-    const ucls = up ? 'up' : 'dn';
-    const arr = up ? '▲' : '▼';
+  c.innerHTML = S.watchlist.map(code=>{
+    const p = prices.find(x=>x.code===code)||{code,name:S.nameCache[code]||code,price:0,change:0,pct:0,ok:false};
+    const up = p.change>=0;
+    const cls = up?'up':'dn'; const arr=up?'▲':'▼';
     return `<div class="sc ${cls}" onclick="openCore('${p.code}','${p.name||code}',${p.price})">
+      <div class="sc-actions">
+        <div class="sc-act" onclick="event.stopPropagation();editStock('${p.code}','${p.name||code}')">✏️</div>
+        <div class="sc-act del" onclick="event.stopPropagation();deleteStock('${p.code}')">✕</div>
+      </div>
       <div class="sc-top">
-        <div><div class="sc-name">${p.name || code}</div><div class="sc-code">${p.code}</div></div>
-        <div class="sc-price">
-          <div class="sc-pv ${ucls}">${p.price ? p.price.toFixed(2) : '--'}</div>
-          <div class="sc-chg ${ucls}">${p.price ? arr+' '+Math.abs(p.change).toFixed(2)+' ('+p.pct.toFixed(2)+'%)' : '--'}</div>
+        <div>
+          <div class="sc-name">${p.name||code}</div>
+          <div class="sc-code">${p.code}</div>
+        </div>
+        <div>
+          <div class="sc-pv ${cls}">${p.price?p.price.toFixed(2):'--'}</div>
+          <div class="sc-chg ${cls}">${p.price?arr+' '+Math.abs(p.change).toFixed(2)+' ('+Math.abs(p.pct).toFixed(2)+'%)':'--'}</div>
         </div>
       </div>
       <div class="sc-bot">
-        <div class="ms"><div class="ms-l">成交量</div><div class="ms-v">${fmtVol(p.vol)}</div></div>
+        <div class="ms"><div class="ms-l">成交</div><div class="ms-v">${fmtVol(p.vol)}</div></div>
         <div class="ms"><div class="ms-l">最高</div><div class="ms-v up">${p.high||'--'}</div></div>
         <div class="ms"><div class="ms-l">最低</div><div class="ms-v dn">${p.low||'--'}</div></div>
         <div class="ms"><div class="ms-l">開盤</div><div class="ms-v">${p.open||'--'}</div></div>
@@ -889,319 +942,482 @@ function renderWatchlist(prices) {
   }).join('');
 }
 
-function fmtVol(v) {
-  if (!v) return '--';
-  if (v >= 10000) return (v/10000).toFixed(1)+'萬';
-  return v.toString();
+// 搜尋股名（輸入代號即時預覽）
+async function lookupName(code) {
+  const el = document.getElementById('addNamePreview');
+  if (!code || code.length < 4) { el.textContent=''; return; }
+  if (S.nameCache[code]) { el.textContent='✓ '+S.nameCache[code]; return; }
+  const r = await gas('searchStock',{q:code});
+  if (r?.results?.length) {
+    const m = r.results.find(s=>s.code===code);
+    if (m) { S.nameCache[code]=m.name; el.textContent='✓ '+m.name; }
+    else el.textContent='？ 無法確認名稱';
+  }
 }
 
 function openAddStock() {
+  document.getElementById('addTitle').textContent='➕ 新增自選股';
+  document.getElementById('addCode').value='';
+  document.getElementById('addNamePreview').textContent='';
+  document.getElementById('addCode').dataset.editMode='';
   document.getElementById('ovAdd').classList.add('on');
-  setTimeout(() => document.getElementById('addInput').focus(), 300);
+  setTimeout(()=>document.getElementById('addCode').focus(),300);
 }
+
+function editStock(code, name) {
+  document.getElementById('addTitle').textContent='✏️ 查看：'+name;
+  document.getElementById('addCode').value=code;
+  document.getElementById('addNamePreview').textContent='✓ '+name;
+  document.getElementById('addCode').dataset.editMode='view';
+  document.getElementById('ovAdd').classList.add('on');
+}
+
+function deleteStock(code) {
+  const name = S.nameCache[code]||code;
+  if (!confirm(`確定移除「${name}」(${code}) 嗎？`)) return;
+  S.watchlist = S.watchlist.filter(c=>c!==code);
+  saveWatch();
+  loadWatchlist();
+  toast(`✅ 已移除 ${name}`);
+  if (S.isLoggedIn) gas('saveWatchlist',{lineId:S.user.lineId,codes:S.watchlist});
+}
+
 async function confirmAdd() {
-  const code = document.getElementById('addInput').value.trim().toUpperCase();
+  const code = document.getElementById('addCode').value.trim().toUpperCase();
   if (!code) return;
   if (S.watchlist.includes(code)) { toast('⚠️ 已在自選清單中'); return; }
+  // 取名稱
+  let name = S.nameCache[code] || code;
+  if (name===code) {
+    const r=await gas('searchStock',{q:code});
+    if(r?.results?.length){const m=r.results.find(s=>s.code===code);if(m){name=m.name;S.nameCache[code]=m.name;}}
+  }
   S.watchlist.push(code);
   saveWatch();
   closeOvId('ovAdd');
-  toast('✅ 已新增 ' + code);
+  toast(`✅ 已新增 ${name}(${code})`);
   await loadWatchlist();
-  if (S.isLoggedIn) gas('saveWatchlist', { lineId: S.user.lineId, codes: S.watchlist });
+  if (S.isLoggedIn) gas('saveWatchlist',{lineId:S.user.lineId,codes:S.watchlist});
 }
 
-function saveWatch() { localStorage.setItem('rdWatch', JSON.stringify(S.watchlist)); }
+function saveWatch() { localStorage.setItem('rdWatch',JSON.stringify(S.watchlist)); }
 
-// ═══════════════════════════════════════════
-//  CORE FUNC MODAL (分析 modal)
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════
+//  K 線圖（Chart.js 當沖版）
+// ═══════════════════════════════════
 function openCore(code, name, price) {
-  S.currentStock = { code, name, price };
-  document.getElementById('coreTitle').textContent = `${name} (${code})  $${price}`;
-  document.querySelectorAll('#coreTabs .chtab').forEach(t => t.classList.remove('on'));
-  document.querySelector('#coreTabs .chtab').classList.add('on');
-  S.currentCoreTab = '主力進出';
+  S.currentStock = {code,name,price};
+  document.getElementById('klineName').textContent=name;
+  document.getElementById('klineCode').textContent=code;
+  const p=S.priceCache[code]||{};
+  document.getElementById('klinePrice').textContent=price?price.toFixed(2):'--';
+  const up=p.change>=0;
+  document.getElementById('klineChg').textContent=price?(up?'▲ ':' ▼ ')+Math.abs(p.change||0).toFixed(2)+' ('+(up?'+':'-')+Math.abs(p.pct||0).toFixed(2)+'%)':'--';
+  document.getElementById('klineChg').className='sc-chg '+(up?'up':'dn');
+  document.getElementById('kDtVol').textContent=fmtVol(p.vol);
+  document.getElementById('kDtBuyPow').textContent=p.vol?Math.min(99,Math.round(((p.close-p.low)/(p.high-p.low||1))*100||50)):'-';
+  document.getElementById('kDtSellPow').textContent=p.vol?Math.min(99,Math.round(((p.high-p.close)/(p.high-p.low||1))*100||50)):'-';
+
+  // 重置 tabs
+  document.querySelectorAll('#coreTabs .tab').forEach(t=>t.classList.remove('on'));
+  document.querySelector('#coreTabs .tab').classList.add('on');
+
   document.getElementById('ovCore').classList.add('on');
+  drawKline(code, name, p);
   loadCoreData('主力進出');
 }
 
+function drawKline(code, name, priceObj) {
+  if (S.klineChart) { S.klineChart.destroy(); S.klineChart=null; }
+  const ctx = document.getElementById('klineChart').getContext('2d');
+  // 生成模擬當日分鐘K線資料（真實環境替換為API）
+  const data = genKlineData(priceObj);
+  const isUp = priceObj.change>=0;
+
+  if (S.klineType==='candle') {
+    // 蠟燭圖用 bar dataset 模擬
+    const opens=[],closes=[],highs=[],lows=[],colors=[];
+    data.forEach(d=>{
+      const u=d.close>=d.open;
+      opens.push(d.open);closes.push(d.close);highs.push(d.high);lows.push(d.low);
+      colors.push(u?'rgba(255,34,51,.85)':'rgba(0,230,118,.85)');
+    });
+    S.klineChart = new Chart(ctx,{
+      type:'bar',
+      data:{
+        labels:data.map(d=>d.t),
+        datasets:[
+          {label:'K線',data:data.map(d=>([Math.min(d.open,d.close),Math.max(d.open,d.close)])),
+            backgroundColor:colors,borderColor:colors,borderWidth:1,barPercentage:.6},
+          {type:'line',label:'High/Low',data:data.map(d=>d.high),borderColor:'transparent',pointRadius:0,
+            segment:{borderColor:ctx=>'transparent'}},
+        ]
+      },
+      options: klineOpts(data,'K線'),
+    });
+  } else if (S.klineType==='line') {
+    S.klineChart = new Chart(ctx,{
+      type:'line',
+      data:{labels:data.map(d=>d.t),
+        datasets:[{label:'收盤',data:data.map(d=>d.close),
+          borderColor:isUp?'var(--red)':'var(--grn)',borderWidth:2,
+          pointRadius:0,fill:true,
+          backgroundColor:isUp?'rgba(255,34,51,.07)':'rgba(0,230,118,.07)',
+          tension:.3}]},
+      options:klineOpts(data,'分鐘折線'),
+    });
+  } else {
+    // 量能圖
+    S.klineChart = new Chart(ctx,{
+      type:'bar',
+      data:{labels:data.map(d=>d.t),
+        datasets:[{label:'量',data:data.map(d=>d.vol),
+          backgroundColor:data.map(d=>d.close>=d.open?'rgba(255,34,51,.7)':'rgba(0,230,118,.7)')}]},
+      options:klineOpts(data,'成交量'),
+    });
+  }
+}
+
+function klineOpts(data, label) {
+  return {
+    responsive:true, maintainAspectRatio:false,
+    animation:{duration:400,easing:'easeOutQuart'},
+    plugins:{legend:{display:false},tooltip:{
+      backgroundColor:'rgba(10,15,23,.95)',
+      titleColor:'#e8edf5',bodyColor:'#8896a8',
+      borderColor:'rgba(255,34,51,.3)',borderWidth:1,
+      callbacks:{
+        title:items=>'⏰ '+items[0].label,
+        label:item=>`${item.dataset.label}: ${typeof item.raw==='number'?item.raw.toFixed(2):JSON.stringify(item.raw)}`,
+      }
+    }},
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3a4a5c',font:{size:9},maxRotation:0,
+        callback:(v,i)=>i%Math.ceil(data.length/6)===0?data[i]?.t:''}},
+      y:{position:'right',grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3a4a5c',font:{size:9},
+        callback:v=>v>=1000?(v/1000).toFixed(1)+'k':v}},
+    }
+  };
+}
+
+function genKlineData(p) {
+  // 生成當日分鐘K（09:00-13:30，盤中走勢模擬）
+  const base = p.open || p.price || 100;
+  const range = (p.high-p.low)||base*0.03;
+  const data=[];
+  let cur=p.open||base;
+  const mins=270; // 9:00到13:30
+  for(let i=0;i<mins;i+=5) {
+    const h=Math.floor(i/60)+9, m=(i%60);
+    const t=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+    const o=cur;
+    const delta=(Math.random()-.48)*(range/30);
+    cur=Math.max(p.low||base*.95,Math.min(p.high||base*1.05,cur+delta));
+    const hi=Math.max(o,cur)+Math.random()*(range/60);
+    const lo=Math.min(o,cur)-Math.random()*(range/60);
+    data.push({t,open:+o.toFixed(2),close:+cur.toFixed(2),high:+hi.toFixed(2),low:+lo.toFixed(2),vol:Math.floor(Math.random()*500+100)});
+  }
+  // 強制收盤價接近真實
+  if(data.length>0&&p.price){data[data.length-1].close=p.price;}
+  return data;
+}
+
+function setKlineType(el, type) {
+  document.querySelectorAll('.kline-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on'); S.klineType=type;
+  const p=S.priceCache[S.currentStock?.code]||{};
+  drawKline(S.currentStock?.code,S.currentStock?.name,p);
+}
+
+// ═══════════════════════════════════
+//  核心分析資料
+// ═══════════════════════════════════
 function setCoreTab(el, tab) {
-  document.querySelectorAll('#coreTabs .chtab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('#coreTabs .tab').forEach(t=>t.classList.remove('on'));
   el.classList.add('on');
-  S.currentCoreTab = tab;
   loadCoreData(tab);
 }
 
 async function loadCoreData(tab) {
-  const c = document.getElementById('coreContent');
-  const code = S.currentStock?.code;
-  c.innerHTML = '<div class="no-data"><div class="spin"></div></div>';
+  const c=document.getElementById('coreContent');
+  const code=S.currentStock?.code;
+  c.innerHTML='<div class="loading-row"><div class="spin"></div></div>';
   try {
-    if (tab === '主力進出' || tab === '大戶分析') {
-      const r = await gas('getInstitutional', { code });
-      renderInstitutional(r, tab);
-    } else if (tab === '融資融券') {
-      const r = await gas('getMarginShort', { code });
-      renderMarginShort(r);
-    } else if (tab === '當沖資訊') {
-      const r = await gas('getDayTrade', { code });
-      renderDayTrade(r);
-    } else if (tab === '關鍵分點') {
-      const r = await gas('getTopBuySell', { code });
-      renderBrokerTop(r);
-    }
-  } catch(e) {
-    c.innerHTML = `<div class="err-banner">資料載入失敗：${e.message}</div>`;
-  }
+    let r;
+    if (tab==='主力進出'||tab==='大戶分析') { r=await gas('getInstitutional',{code}); renderInstitutional(r,tab); }
+    else if (tab==='融資融券') { r=await gas('getMarginShort',{code}); renderMarginShort(r); }
+    else if (tab==='當沖資訊') { r=await gas('getDayTrade',{code}); renderDayTradeInfo(r); }
+    else if (tab==='關鍵分點') { r=await gas('getTopBuySell',{code}); renderTopBuySell(r); }
+  } catch(e) { c.innerHTML=`<div class="err-banner">載入失敗：${e.message}</div>`; }
 }
 
 function renderInstitutional(r, tab) {
-  const c = document.getElementById('coreContent');
-  if (!r?.ok) { c.innerHTML = '<div class="no-data">TWSE 資料暫無</div>'; return; }
-  const d = r.data;
-  // Parse BFI82U format: 外資、投信、自營商
-  let rows = [];
-  if (d?.data) {
-    d.data.forEach(row => {
-      if (row[1]) rows.push({ label: row[1], buy: row[2], sell: row[3], net: row[4] });
-    });
-  }
-  if (!rows.length) {
-    // Fallback structure display
-    c.innerHTML = `<div class="no-data">今日法人資料尚未更新（盤後約16:00公布）<br><br>資料日期：${r.date||'--'}</div>`;
-    return;
-  }
-  c.innerHTML = rows.slice(0,6).map(row => `
-    <div class="drow">
-      <span class="dl">${row.label}</span>
-      <div style="text-align:right">
-        <div class="dv ${parseFloat(row.net?.replace(/,/g,''))>=0?'up':'dn'}" style="font-size:12px">${row.net||'--'}</div>
-        <div style="font-size:10px;color:var(--t3)">買${row.buy||'--'} 賣${row.sell||'--'}</div>
-      </div>
-    </div>`).join('');
+  const c=document.getElementById('coreContent');
+  if (!r?.ok||!r?.data) { c.innerHTML='<div class="no-data">TWSE 資料尚未更新（盤後約16:00）</div>'; return; }
+  const d=r.data;
+  if (d?.data?.length) {
+    c.innerHTML='<div class="card">'+d.data.slice(0,8).map(row=>{
+      const netStr=String(row[4]||'0').replace(/,/g,'');
+      const net=parseFloat(netStr)||0;
+      const pct=Math.min(100,Math.abs(net)/500*100);
+      return `<div class="drow"><span class="dl">${row[1]||'--'}</span>
+        <div style="text-align:right">
+          <div class="dv ${net>=0?'up':'dn'}">${row[4]||'--'}</div>
+          <div style="width:60px;height:4px;background:var(--bg3);border-radius:2px;margin-top:3px;margin-left:auto">
+            <div style="width:${pct}%;height:100%;background:${net>=0?'var(--red)':'var(--grn)'};border-radius:2px"></div>
+          </div>
+        </div></div>`;
+    }).join('')+'<div style="font-size:9px;color:var(--t3);margin-top:6px">資料日期：'+r.date+'</div></div>';
+  } else { c.innerHTML='<div class="no-data">盤後資料約16:00更新</div>'; }
 }
 
 function renderMarginShort(r) {
-  const c = document.getElementById('coreContent');
-  if (!r?.ok) { c.innerHTML = '<div class="no-data">融資融券資料暫無</div>'; return; }
-  const d = r.data;
-  if (!d?.data?.length) {
-    c.innerHTML = `<div class="no-data">盤後資料尚未更新（約14:00公布）<br>日期：${r.date||'--'}</div>`;
-    return;
-  }
-  const row = d.data[0];
-  // 融資欄：[0]代號 [1]名稱 [2]融資買 [3]融資賣 [4]融資餘 [5]融資增減 [9]融券買 [10]融券賣 [11]融券餘 [12]融券增減
-  c.innerHTML = `
-    <div class="drow"><span class="dl">融資餘額</span><div class="dv">${row[4]||'--'}張</div></div>
-    <div class="drow"><span class="dl">融資增減</span><div class="dv ${parseFloat(row[5])>=0?'up':'dn'}">${row[5]||'--'}張</div></div>
-    <div class="drow"><span class="dl">融券餘額</span><div class="dv">${row[11]||'--'}張</div></div>
-    <div class="drow"><span class="dl">融券增減</span><div class="dv ${parseFloat(row[12])>=0?'dn':'up'}">${row[12]||'--'}張</div></div>
-    <div class="drow"><span class="dl">資料日期</span><div class="dv neu" style="font-size:11px">${r.date||'--'}</div></div>`;
+  const c=document.getElementById('coreContent');
+  if (!r?.ok||!r?.data?.data?.length) { c.innerHTML='<div class="no-data">融資融券盤後約14:00更新</div>'; return; }
+  const row=r.data.data[0];
+  c.innerHTML=`<div class="card">
+    <div class="drow"><span class="dl">融資餘額</span><span class="dv">${row[4]||'--'} 張</span></div>
+    <div class="drow"><span class="dl">融資增減</span><span class="dv ${parseFloat(row[5])>=0?'up':'dn'}">${row[5]||'--'} 張</span></div>
+    <div class="drow"><span class="dl">融券餘額</span><span class="dv">${row[11]||'--'} 張</span></div>
+    <div class="drow"><span class="dl">融券增減</span><span class="dv ${parseFloat(row[12])>=0?'dn':'up'}">${row[12]||'--'} 張</span></div>
+    <div style="font-size:9px;color:var(--t3);margin-top:6px">資料日期：${r.date}</div></div>`;
 }
 
-function renderDayTrade(r) {
-  const c = document.getElementById('coreContent');
-  c.innerHTML = `
-    <div class="drow"><span class="dl">當沖資訊</span><div class="dv">TWSE 資料</div></div>
-    <div class="drow"><span class="dl">查詢代號</span><div class="dv">${S.currentStock?.code||'--'}</div></div>
-    <div class="drow"><span class="dl">資料來源</span><div class="dv neu" style="font-size:11px">台灣證券交易所</div></div>
-    <div style="margin-top:10px;font-size:11px;color:var(--t3)">當沖詳細統計於每日盤後公布（約14:30）</div>`;
+function renderDayTradeInfo(r) {
+  const c=document.getElementById('coreContent');
+  const p=S.priceCache[S.currentStock?.code]||{};
+  const range=p.high&&p.low?((p.high-p.low)/p.low*100).toFixed(2):'--';
+  c.innerHTML=`<div class="card">
+    <div class="drow"><span class="dl">當日振幅</span><span class="dv">${range}%</span></div>
+    <div class="drow"><span class="dl">成交量</span><span class="dv">${fmtVol(p.vol)}</span></div>
+    <div class="drow"><span class="dl">最高價</span><span class="dv up">${p.high||'--'}</span></div>
+    <div class="drow"><span class="dl">最低價</span><span class="dv dn">${p.low||'--'}</span></div>
+    <div class="drow"><span class="dl">開盤</span><span class="dv">${p.open||'--'}</span></div>
+    <div style="font-size:9px;color:var(--t3);margin-top:6px">當沖詳細統計盤後更新</div></div>`;
 }
 
-function renderBrokerTop(r) {
-  const c = document.getElementById('coreContent');
-  if (!r?.ok || !r?.data?.data?.length) {
-    c.innerHTML = '<div class="no-data">分點資料盤後公布</div>'; return;
-  }
-  const rows = r.data.data.slice(0,8);
-  c.innerHTML = rows.map(row => `
-    <div class="drow">
-      <span class="dl">${row[0]||'--'}</span>
-      <div style="text-align:right">
-        <div style="font-size:11px;color:var(--t2)">成交${row[2]||'--'}張</div>
-      </div>
-    </div>`).join('');
+function renderTopBuySell(r) {
+  const c=document.getElementById('coreContent');
+  if (!r?.ok||!r?.data?.data?.length) { c.innerHTML='<div class="no-data">分點資料盤後公布</div>'; return; }
+  c.innerHTML='<div class="card">'+r.data.data.slice(-5).map(row=>
+    `<div class="drow"><span class="dl">${row[0]||'--'}</span><span class="dv neu" style="font-size:11px">量${row[1]||'--'} 高${row[4]||'--'}</span></div>`
+  ).join('')+'</div>';
 }
 
-// ═══════════════════════════════════════════
-//  MARKET PAGE
-// ═══════════════════════════════════════════
-const MKT_CODES = {
+// ═══════════════════════════════════
+//  市場
+// ═══════════════════════════════════
+const MKT = {
   all:  ['2330','2454','2317','2308','2303','2882','0050','2382','6505','3711'],
-  semi: ['2330','2454','2303','3711','2337'],
-  ai:   ['2317','2382','3006','2301'],
-  ev:   ['2308','6669','3105'],
-  fin:  ['2882','2881','2886','2884'],
-  etf:  ['0050','0056','00878','00929'],
-  day:  ['2330','2454','2317','2308','6770','2382'], // 熱門當沖股
+  semi: ['2330','2454','2303','3711','3034'],
+  ai:   ['2317','2382','3006','6770','4935'],
+  ev:   ['2308','6669','3105','2337'],
+  fin:  ['2882','2881','2886','2884','2891'],
+  etf:  ['0050','0056','00878','00929','00919'],
+  day:  ['2330','2454','2317','2308','2382','6770'],
 };
-let curCat = 'all';
+let curCat='all';
+
+async function loadIndex() {
+  const r = await gas('getIndex');
+  if (!r?.ok) { document.getElementById('idxVal').textContent='連線失敗'; return; }
+  // ★ 修正解析：TWSE MI_INDEX(type=MS) 格式
+  const taiex=r?.taiex;
+  if (taiex?.stat==='OK'&&taiex?.data?.length) {
+    // 找加權那一列（通常 data[0] 就是）
+    const row=taiex.data.find(d=>(String(d[0]||'')).includes('加權'))||taiex.data[0];
+    if (row) {
+      const val=parseFloat(String(row[1]||'0').replace(/,/g,''));
+      const chgStr=String(row[2]||'');
+      const chg=parseFloat(chgStr.replace(/[▲▼+\-,\s]/g,''))||0;
+      const isUp=chgStr.includes('▲')||chgStr.startsWith('+');
+      const pctStr=String(row[3]||'');
+      const pct=parseFloat(pctStr.replace(/[▲▼+\-,%\s]/g,''))||0;
+      if (val>0) {
+        document.getElementById('idxVal').textContent=val.toLocaleString();
+        document.getElementById('idxChg').textContent=(isUp?'▲ +':'▼ ')+Math.abs(chg).toFixed(2)+' ('+(isUp?'+':'-')+Math.abs(pct).toFixed(2)+'%)';
+        document.getElementById('idxChg').className='idx-chg '+(isUp?'up':'dn');
+      }
+    }
+  } else if (taiex?.stat!=='OK') {
+    document.getElementById('idxVal').textContent=r.taiexMsg||'盤後資料';
+  }
+  // 上漲/下跌家數
+  const cats=r?.categories;
+  if (cats?.stat==='OK'&&cats?.data?.length) {
+    let up=0,dn=0,vol=0;
+    cats.data.forEach(row=>{
+      const c2=String(row[2]||'');
+      if(c2.includes('▲')||parseFloat(c2)>0) up++; else if(c2.includes('▼')||parseFloat(c2)<0) dn++;
+      vol+=parseFloat(String(row[6]||'0').replace(/,/g,''))||0;
+    });
+    if(up) document.getElementById('idxUp').textContent=up;
+    if(dn) document.getElementById('idxDn').textContent=dn;
+    if(vol) document.getElementById('idxVol').textContent=(vol/1e8).toFixed(0);
+  }
+  if (r.isWeekend) toast('📅 週末顯示週五收盤');
+}
 
 async function loadMarket() {
-  const codes = MKT_CODES[curCat] || MKT_CODES.all;
-  document.getElementById('mktList').innerHTML = '<div class="no-data"><div class="spin"></div><br>載入中...</div>';
-  const r = await gas('getPrices', { codes });
-  if (r?.ok && r.prices?.length) {
-    r.prices.forEach(p => { if(p.code) S.priceCache[p.code] = p; });
+  const codes=MKT[curCat]||MKT.all;
+  document.getElementById('mktList').innerHTML='<div class="loading-row"><div class="spin"></div><br>載入中...</div>';
+  const r=await gas('getPrices',{codes});
+  if (r?.ok&&r.prices?.length) {
+    r.prices.forEach(p=>{S.priceCache[p.code]=p;if(p.name)S.nameCache[p.code]=p.name;});
     renderMktList(r.prices);
   } else {
-    document.getElementById('mktList').innerHTML = '<div class="err-banner">無法取得資料，請確認 GAS 設定</div>';
+    document.getElementById('mktList').innerHTML='<div class="err-banner">無法取得資料</div>';
   }
-  // Also refresh index
-  loadIndex();
 }
 
 function renderMktList(prices) {
-  const q = document.getElementById('mktSearch').value;
-  let list = prices;
-  if (q) list = list.filter(p => p.code?.includes(q) || p.name?.includes(q));
-  document.getElementById('mktList').innerHTML = list.map(p => {
-    const up = p.change >= 0;
-    return `<div class="sli" onclick="openCore('${p.code}','${p.name}',${p.price})">
-      <div><div class="sli-n">${p.name}</div><div class="sli-c">${p.code}</div></div>
-      <div style="text-align:right">
+  const q=document.getElementById('mktSearch').value;
+  let list=prices;
+  if(q) list=list.filter(p=>p.code?.includes(q)||p.name?.includes(q));
+  document.getElementById('mktList').innerHTML=list.map(p=>{
+    const up=p.change>=0;
+    return `<div class="sli" onclick="openCore('${p.code}','${p.name||p.code}',${p.price})">
+      <div><div class="sli-n">${p.name||p.code}</div><div class="sli-c">${p.code}</div></div>
+      <div>
         <div class="sli-p ${up?'up':'dn'}">${p.price?.toFixed(2)||'--'}</div>
         <div class="sli-ch ${up?'up':'dn'}">${up?'▲':'▼'} ${Math.abs(p.pct||0).toFixed(2)}%</div>
       </div>
     </div>`;
-  }).join('') || '<div class="no-data">查無結果</div>';
+  }).join('')||'<div class="no-data">查無結果</div>';
 }
 
 function setCat(el, cat) {
-  document.querySelectorAll('#catTabs .tab').forEach(t => t.classList.remove('on'));
-  el.classList.add('on'); curCat = cat; loadMarket();
+  document.querySelectorAll('#catTabs .tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on'); curCat=cat; loadMarket();
 }
 function onSearch(q) {
-  const prices = Object.values(S.priceCache);
+  const prices=Object.values(S.priceCache);
   renderMktList(prices);
 }
 
-// ═══════════════════════════════════════════
-//  NOTIFY
-// ═══════════════════════════════════════════
-function selNfType(t) {
-  S.notifyType = t;
-  document.getElementById('nfBuy').className = 'frbtn' + (t==='buy'?' sel-buy':'');
-  document.getElementById('nfSell').className = 'frbtn' + (t==='sell'?' sel-sell':'');
-}
-function selNfCh(c) {
-  S.notifyChannel = c;
-  document.getElementById('nfLine').className = 'frbtn' + (c==='line'?' sel-line':'');
-  document.getElementById('nfTg').className = 'frbtn' + (c==='telegram'?' sel-tg':'');
-}
-async function addNotify() {
-  const code = document.getElementById('nfCode').value.trim().toUpperCase();
-  const price = document.getElementById('nfPrice').value;
-  if (!code||!price||!S.notifyType||!S.notifyChannel) { toast('⚠️ 請填寫完整設定'); return; }
-  const p = S.priceCache[code];
-  const n = { id:'N'+Date.now(), code, stockName: p?.name||code, price: parseFloat(price), type: S.notifyType, channel: S.notifyChannel, enabled: true };
-  S.notifications.push(n);
-  localStorage.setItem('rdNotify', JSON.stringify(S.notifications));
-  renderNotifyList();
-  document.getElementById('nfCode').value = ''; document.getElementById('nfPrice').value = '';
-  if (S.isLoggedIn) {
-    const r = await gas('addNotify', { lineId: S.user.lineId, code, stockName: n.stockName, price: n.price, type: n.type, channel: n.channel });
-    if (r?.ok) toast('✅ 通知已設定（已同步雲端）');
-    else toast('✅ 通知已設定（本機儲存）');
+// ═══════════════════════════════════
+//  通知（★ 依方案控制通知管道）
+// ═══════════════════════════════════
+function updateNotifyChannelUI() {
+  const plan=S.user?.plan||'free';
+  const isYearly=plan==='yearly';
+  const isMonthly=plan==='monthly'||isYearly;
+  // 月費：可用 Telegram；年費：可用 LINE+TG+雙送；免費試用：全部可用
+  const trial=S.freeTrial;
+  ['nfLine','nfBoth'].forEach(id=>{
+    const el=document.getElementById(id);
+    if (isYearly||trial) el.classList.remove('disabled');
+    else el.classList.add('disabled');
+  });
+  document.getElementById('nfTg').classList.remove('disabled');
+  if (trial) {
+    document.getElementById('notifyPlanHint').textContent='（試用期間全部開放）';
+  } else if (isYearly) {
+    document.getElementById('notifyPlanHint').textContent='（年費：LINE+TG均可）';
+  } else if (isMonthly) {
+    document.getElementById('notifyPlanHint').textContent='（月費：Telegram通知）';
   } else {
-    toast('✅ 通知已設定（登入後可雲端同步）');
+    document.getElementById('notifyPlanHint').textContent='（免費：僅Telegram）';
   }
 }
+
+function selNfType(t) {
+  S.notifyType=t;
+  document.getElementById('nfBuy').className='frbtn'+(t==='buy'?' sel-buy':'');
+  document.getElementById('nfSell').className='frbtn'+(t==='sell'?' sel-sell':'');
+}
+
+function selNfCh(c) {
+  S.notifyChannel=c;
+  document.getElementById('nfTg').className='frbtn'+(c==='telegram'?' sel-tg':'');
+  document.getElementById('nfLine').className='frbtn'+(document.getElementById('nfLine').classList.contains('disabled')?'frbtn disabled':(c==='line'?'frbtn sel-line':'frbtn'));
+  document.getElementById('nfBoth').className='frbtn'+(document.getElementById('nfBoth').classList.contains('disabled')?'frbtn disabled':(c==='both'?'frbtn sel-both':'frbtn'));
+}
+
+async function addNotify() {
+  const code=document.getElementById('nfCode').value.trim().toUpperCase();
+  const price=document.getElementById('nfPrice').value;
+  if(!code||!price||!S.notifyType||!S.notifyChannel){toast('⚠️ 請填完整設定');return;}
+  const name=S.nameCache[code]||code;
+  const n={id:'N'+Date.now(),code,stockName:name,price:parseFloat(price),type:S.notifyType,channel:S.notifyChannel,enabled:true};
+  S.notifyList.push(n);
+  localStorage.setItem('rdNotify',JSON.stringify(S.notifyList));
+  renderNotifyList();
+  document.getElementById('nfCode').value='';document.getElementById('nfPrice').value='';
+  if(S.isLoggedIn) {
+    const r=await gas('addNotify',{lineId:S.user.lineId,code,stockName:name,price:n.price,type:n.type,channel:n.channel});
+    toast(r?.ok?'✅ 通知已設定（雲端同步）':'✅ 通知已設定（本機）');
+  } else toast('✅ 通知已設定（登入後可同步）');
+}
+
 function renderNotifyList() {
-  const c = document.getElementById('nfList');
-  if (!S.notifications.length) { c.innerHTML = '<div class="no-data">尚無通知設定</div>'; return; }
-  c.innerHTML = S.notifications.map((n,i) => `
+  const c=document.getElementById('nfList');
+  if(!S.notifyList?.length){c.innerHTML='<div class="no-data">尚無通知設定</div>';return;}
+  c.innerHTML=S.notifyList.map((n,i)=>`
     <div class="nf-card">
       <div>
         <div class="nf-nm">${n.stockName||n.code} (${n.code})</div>
-        <div class="nf-cond">${n.type==='buy'?'≥':'≤'} $${n.price} · ${n.channel==='line'?'💬LINE':'✈️TG'}</div>
+        <div class="nf-cond">${n.type==='buy'?'≥':'≤'} $${n.price} · ${n.channel==='line'?'💬LINE':n.channel==='both'?'🔔雙送':'✈️TG'}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:center;gap:7px">
         <span class="nbadge ${n.type==='buy'?'nb-buy':'nb-sell'}">${n.type==='buy'?'買進':'賣出'}</span>
         <div class="tgl ${n.enabled?'on':''}" onclick="toggleNf(${i})"></div>
       </div>
     </div>`).join('');
 }
-function toggleNf(i) {
-  S.notifications[i].enabled = !S.notifications[i].enabled;
-  localStorage.setItem('rdNotify', JSON.stringify(S.notifications));
-  renderNotifyList();
-}
 
-// ═══════════════════════════════════════════
-//  SCAN PAGE
-// ═══════════════════════════════════════════
-function toggleChip(el) {
-  el.classList.toggle('on');
-  const k = el.dataset.k;
-  if (el.classList.contains('on')) S.scanChips.push(k);
-  else S.scanChips = S.scanChips.filter(c => c !== k);
-}
-function clearChips() {
-  document.querySelectorAll('.strat-chip.on').forEach(el => el.classList.remove('on'));
-  S.scanChips = [];
-}
+function toggleNf(i){S.notifyList[i].enabled=!S.notifyList[i].enabled;localStorage.setItem('rdNotify',JSON.stringify(S.notifyList));renderNotifyList();}
+
+// ═══════════════════════════════════
+//  掃描
+// ═══════════════════════════════════
+function toggleChip(el){el.classList.toggle('on');const k=el.dataset.k;if(el.classList.contains('on'))S.scanChips.push(k);else S.scanChips=S.scanChips.filter(c=>c!==k);}
+function clearChips(){document.querySelectorAll('.strat-chip.on').forEach(e=>e.classList.remove('on'));S.scanChips=[];}
+
 async function runScan() {
-  if (!S.scanChips.length) { toast('⚠️ 請先選擇篩選條件'); return; }
-  document.getElementById('scanResults').innerHTML = '<div class="no-data"><div class="spin"></div><br>掃描中...</div>';
-  // 依選擇的條件決定要查哪些 API
-  const needInstitutional = S.scanChips.some(c=>['投信連買3日','外資連買3日','主力淨買超'].includes(c));
-  const needMargin = S.scanChips.some(c=>['融券增加','融資減少'].includes(c));
-  let results = [];
-  if (needInstitutional) {
-    const r = await gas('getInstitutional', {});
-    if (r?.ok && r.data?.data) {
-      r.data.data.slice(0,8).forEach(row => {
-        if (!row[1]) return;
-        const net = parseInt((row[4]||'0').replace(/,/g,''));
-        results.push({ name: row[1], detail: `法人淨買超 ${row[4]||'--'}億`, score: Math.min(99,50+Math.abs(net)/100|0), type: net>0?'buy':'sell', time: '--' });
-      });
-    }
+  if(!S.scanChips.length){toast('⚠️ 請選擇篩選條件');return;}
+  document.getElementById('scanResults').innerHTML='<div class="loading-row"><div class="spin"></div><br>掃描中...</div>';
+  const r=await gas('getInstitutional',{});
+  const results=[];
+  if(r?.ok&&r?.data?.data?.length) {
+    r.data.data.slice(0,8).forEach(row=>{
+      const net=parseFloat(String(row[4]||'0').replace(/,/g,''))||0;
+      if(row[1]) results.push({name:row[1],detail:'法人淨'+(net>=0?'買':'賣')+'超 '+row[4]+'億',score:Math.min(99,40+Math.abs(net)/500|0),type:net>=0?'buy':'sell',time:'盤後'});
+    });
   }
-  if (!results.length) {
-    results = [{name:'資料載入中', detail:'TWSE 盤後資料更新後可掃描', score:0, type:'neu', time:'--'}];
-  }
+  if(!results.length) results.push({name:'資料尚未更新',detail:'TWSE 盤後約16:00更新',score:0,type:'neu',time:'--'});
   renderScanResults(results);
 }
 
-function setScanMode(el, mode) {
-  document.querySelectorAll('.scan-opt').forEach(s => s.classList.remove('on'));
-  el.classList.add('on'); S.scanMode = mode;
-  loadScanByMode(mode);
+function setScanMode(el,mode){
+  document.querySelectorAll('.scan-opt').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');S.scanMode=mode;loadScanByMode(mode);
 }
 
 async function loadScanByMode(mode) {
-  document.getElementById('scanResults').innerHTML = '<div class="no-data"><div class="spin"></div><br>載入 TWSE 資料...</div>';
-  let results = [];
+  document.getElementById('scanResults').innerHTML='<div class="loading-row"><div class="spin"></div><br>載入中...</div>';
+  let results=[];
   try {
-    if (mode === '主力異動') {
-      const r = await gas('getInstitutional', {});
-      if (r?.ok && r.data?.data?.length) {
-        r.data.data.slice(0,6).forEach(row => {
-          const net = parseInt((row[4]||'0').replace(/,/g,''));
-          if(row[1]) results.push({ name: row[1], detail: `法人淨${net>=0?'買':'賣'}超 ${row[4]||'--'}`, score: Math.min(99, 40+Math.abs(net)/500|0), type: net>=0?'buy':'sell', time: '盤後' });
-        });
-      }
-    } else if (mode === '融券攻擊') {
-      const r = await gas('getMarginShort', {});
-      if (r?.ok && r.data?.data?.length) {
-        r.data.data.slice(0,6).forEach(row => {
-          const inc = parseInt((row[12]||'0').replace(/,/g,''));
-          if(row[1]&&inc>0) results.push({ name: row[1]+' '+row[0], detail: `融券增加 ${row[12]} 張`, score: Math.min(99, 50+inc/10|0), type:'buy', time:'盤後' });
-        });
-      }
+    if(mode==='主力異動'){
+      const r=await gas('getInstitutional',{});
+      if(r?.ok&&r?.data?.data?.length) r.data.data.slice(0,6).forEach(row=>{
+        const net=parseFloat(String(row[4]||'0').replace(/,/g,''))||0;
+        if(row[1])results.push({name:row[1],detail:'淨買超 '+row[4]+'億',score:Math.min(99,40+Math.abs(net)/500|0),type:net>=0?'buy':'sell',time:'盤後'});
+      });
+    } else if(mode==='融券攻擊'){
+      const r=await gas('getMarginShort',{});
+      if(r?.ok&&r?.data?.data?.length) r.data.data.slice(0,6).filter(row=>parseFloat(String(row[12]||'0').replace(/,/g,''))>0).forEach(row=>{
+        results.push({name:(row[1]||'')+(row[0]?'('+row[0]+')':''),detail:'融券增加 '+row[12]+' 張',score:Math.min(99,55),type:'buy',time:'盤後'});
+      });
     }
-  } catch(e) {}
-  if (!results.length) {
-    results = [{ name:'盤後資料更新後顯示', detail:'TWSE 資料約14:30至16:00公布', score:0, type:'neu', time:'--' }];
-  }
+  } catch(e){}
+  if(!results.length) results=[{name:'盤後才有資料',detail:'TWSE 約14:30~16:00更新',score:0,type:'neu',time:'--'}];
   renderScanResults(results);
 }
 
 function renderScanResults(results) {
-  document.getElementById('scanResults').innerHTML = results.map(r => `
-    <div class="sig-card" onclick="${r.code?`openCore('${r.code}','${r.name}',0)`:''}" >
+  document.getElementById('scanResults').innerHTML=results.map(r=>`
+    <div class="sig-card">
       <div class="sig-ico ${r.type==='buy'?'si-buy':r.type==='sell'?'si-sell':'si-neu'}">${r.type==='buy'?'📈':r.type==='sell'?'📉':'🔍'}</div>
       <div class="sig-inf">
         <div class="si-nm">${r.name}</div>
@@ -1209,290 +1425,324 @@ function renderScanResults(results) {
         <div class="si-tm">${r.time}</div>
       </div>
       ${r.score>0?`<div class="si-sc ${r.type==='buy'?'up':r.type==='sell'?'dn':'neu'}">${r.score}</div>`:''}
-    </div>`).join('') || '<div class="no-data">無資料</div>';
+    </div>`).join('')||'<div class="no-data">無資料</div>';
 }
 
 async function loadBroker() {
-  const code = document.getElementById('brokerCode').value.trim().toUpperCase();
-  if (!code) return;
-  document.getElementById('brokerResult').innerHTML = '<div class="spin"></div>';
-  const r = await gas('getTopBuySell', { code });
-  if (r?.ok && r.data?.data?.length) {
-    const rows = r.data.data.slice(0,5);
-    document.getElementById('brokerResult').innerHTML = rows.map(row =>
-      `<div class="drow"><span class="dl">${row[0]}</span><span class="dv neu" style="font-size:11px">${row[2]||'--'}張</span></div>`
+  const code=document.getElementById('brokerCode').value.trim().toUpperCase();
+  if(!code)return;
+  document.getElementById('brokerResult').innerHTML='<div class="spin"></div>';
+  const r=await gas('getTopBuySell',{code});
+  if(r?.ok&&r?.data?.data?.length) {
+    document.getElementById('brokerResult').innerHTML=r.data.data.slice(-5).map(row=>
+      `<div class="drow"><span class="dl">${row[0]||'--'}</span><span class="dv neu" style="font-size:10px">量${row[1]||'--'}</span></div>`
     ).join('');
-  } else {
-    document.getElementById('brokerResult').innerHTML = '<div style="font-size:12px;color:var(--t3)">無資料（盤後更新）</div>';
-  }
+  } else document.getElementById('brokerResult').innerHTML='<div style="font-size:11px;color:var(--t3)">無資料（盤後更新）</div>';
 }
 
-// ═══════════════════════════════════════════
-//  BIG PAGE（大盤）
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════
+//  大盤
+// ═══════════════════════════════════
 function setBigTab(el, tab) {
-  document.querySelectorAll('.chtab').forEach(t => t.classList.remove('on'));
-  el.classList.add('on'); S.bigTab = tab; loadBigTab(tab);
+  document.querySelectorAll('#pg-big .tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on'); S.bigTab=tab; loadBigTab(tab);
 }
 
 async function loadBigTab(tab) {
-  const c = document.getElementById('bigContent');
-  c.innerHTML = '<div class="no-data"><div class="spin"></div><br>載入 TWSE 資料...</div>';
+  const c=document.getElementById('bigContent');
+  c.innerHTML='<div class="loading-row"><div class="spin"></div><br>載入中...</div>';
   try {
-    if (tab === '台灣指數') {
-      const r = await gas('getIndex');
-      renderBigIndex(r, c);
-    } else if (tab === '三大法人') {
-      const r = await gas('getInstitutional', {});
-      renderBigInstitutional(r, c);
-    } else if (tab === '融資融券') {
-      const r = await gas('getMarginShort', {});
-      renderBigMargin(r, c);
-    } else if (tab === '產業排行') {
-      const r = await gas('getIndustry');
-      renderBigIndustry(r, c);
-    } else if (tab === '當沖統計') {
-      const r = await gas('getDayTradeList');
-      renderBigDayTrade(r, c);
-    }
-  } catch(e) {
-    c.innerHTML = `<div class="err-banner">載入失敗：${e.message}</div>`;
-  }
+    if(tab==='台灣指數'){await loadIndex();c.innerHTML=`<div class="card"><div class="sec" style="margin:0 0 8px">指數資料</div><div class="drow"><span class="dl">加權指數</span><span class="dv up" id="bigIdxVal">${document.getElementById('idxVal').textContent}</span></div><div class="drow"><span class="dl">漲跌幅</span><span class="dv" id="bigIdxChg">${document.getElementById('idxChg').textContent}</span></div><div class="drow"><span class="dl">上漲家數</span><span class="dv up">${document.getElementById('idxUp').textContent}</span></div><div class="drow"><span class="dl">下跌家數</span><span class="dv dn">${document.getElementById('idxDn').textContent}</span></div><div style="font-size:9px;color:var(--t3);margin-top:6px">來源：台灣證券交易所 TWSE</div></div>`;}
+    else if(tab==='三大法人'){const r=await gas('getInstitutional',{});renderBigInstitutional(r,c);}
+    else if(tab==='融資融券'){const r=await gas('getMarginShort',{});renderBigMargin(r,c);}
+    else if(tab==='產業排行'){const r=await gas('getIndustry');renderBigIndustry(r,c);}
+    else if(tab==='當沖統計'){renderBigDayTrade(c);}
+  } catch(e){c.innerHTML=`<div class="err-banner">載入失敗：${e.message}</div>`;}
 }
 
-function renderBigIndex(r, c) {
-  c.innerHTML = `
-    <div class="card">
-      <div class="card-title">台灣指數</div>
-      <div class="drow"><span class="dl">加權指數</span><div class="dv up" id="bigIdx">--</div></div>
-      <div class="drow"><span class="dl">櫃買指數</span><div class="dv" id="bigOtc">--</div></div>
-      <div class="drow"><span class="dl">資料來源</span><div class="dv neu" style="font-size:11px">台灣證券交易所</div></div>
-    </div>
-    <div style="margin-top:8px;font-size:11px;color:var(--t3);text-align:center">指數資料透過 TWSE 官方 API 取得，盤中每分鐘更新</div>`;
-  // Fill from cache
-  if (r?.afterIndex?.data) {
-    const ms = r.afterIndex.data.find(d => d[0]?.includes('加權'));
-    if (ms) document.getElementById('bigIdx').textContent = ms[4]?.replace(/,/g,'') || '--';
-  }
+function renderBigInstitutional(r,c){
+  if(!r?.ok||!r?.data?.data?.length){c.innerHTML='<div class="no-data">盤後約16:00更新</div>';return;}
+  c.innerHTML='<div class="card">'+r.data.data.slice(0,8).map(row=>{
+    const net=parseFloat(String(row[4]||'0').replace(/,/g,''))||0;
+    return `<div class="drow"><span class="dl">${row[1]||'--'}</span><span class="dv ${net>=0?'up':'dn'}">${row[4]||'--'} 億</span></div>`;
+  }).join('')+'<div style="font-size:9px;color:var(--t3);margin-top:6px">日期：'+r.date+'</div></div>';
 }
 
-function renderBigInstitutional(r, c) {
-  if (!r?.ok) { c.innerHTML = '<div class="no-data">TWSE 資料暫無</div>'; return; }
-  const d = r.data;
-  let html = '<div class="card"><div class="card-title">三大法人買賣超（億元）</div>';
-  if (d?.data?.length) {
-    html += d.data.slice(0,8).map(row => {
-      const net = parseFloat((row[4]||'0').replace(/,/g,''));
-      return `<div class="drow"><span class="dl">${row[1]||'--'}</span>
-        <div class="dv ${net>=0?'up':'dn'}">${row[4]||'--'}</div></div>`;
-    }).join('');
-  } else {
-    html += '<div class="no-data" style="font-size:12px">盤後資料約16:00公布</div>';
-  }
-  html += `<div style="margin-top:8px;font-size:10px;color:var(--t3)">資料日期：${r.date||'--'}</div></div>`;
-  c.innerHTML = html;
+function renderBigMargin(r,c){
+  if(!r?.ok||!r?.data?.data?.length){c.innerHTML='<div class="no-data">盤後約14:00更新</div>';return;}
+  const last=r.data.data[r.data.data.length-1];
+  c.innerHTML=`<div class="card">
+    <div class="drow"><span class="dl">融資餘額合計</span><span class="dv">${last[4]||'--'}</span></div>
+    <div class="drow"><span class="dl">融資增減</span><span class="dv ${parseFloat(last[5])>=0?'up':'dn'}">${last[5]||'--'}</span></div>
+    <div class="drow"><span class="dl">融券餘額合計</span><span class="dv">${last[11]||'--'}</span></div>
+    <div class="drow"><span class="dl">融券增減</span><span class="dv ${parseFloat(last[12])>=0?'dn':'up'}">${last[12]||'--'}</span></div>
+    <div style="font-size:9px;color:var(--t3);margin-top:6px">日期：${r.date}</div></div>`;
 }
 
-function renderBigMargin(r, c) {
-  if (!r?.ok) { c.innerHTML = '<div class="no-data">TWSE 資料暫無</div>'; return; }
-  const d = r.data;
-  let html = '<div class="card"><div class="card-title">融資融券整體概況</div>';
-  if (d?.data?.length) {
-    // Show summary row (usually last row is 合計)
-    const last = d.data[d.data.length-1];
-    html += `
-      <div class="drow"><span class="dl">融資餘額合計</span><div class="dv">${last[4]||'--'}</div></div>
-      <div class="drow"><span class="dl">融資增減</span><div class="dv ${parseFloat(last[5])>=0?'up':'dn'}">${last[5]||'--'}</div></div>
-      <div class="drow"><span class="dl">融券餘額合計</span><div class="dv">${last[11]||'--'}</div></div>
-      <div class="drow"><span class="dl">融券增減</span><div class="dv ${parseFloat(last[12])>=0?'dn':'up'}">${last[12]||'--'}</div></div>`;
-  } else {
-    html += '<div class="no-data" style="font-size:12px">盤後資料約14:00公布</div>';
-  }
-  html += `<div style="margin-top:8px;font-size:10px;color:var(--t3)">資料日期：${r.date||'--'}</div></div>`;
-  c.innerHTML = html;
+function renderBigIndustry(r,c){
+  if(!r?.ok||!r?.data?.data?.length){c.innerHTML='<div class="no-data">產業資料盤後更新</div>';return;}
+  c.innerHTML='<div class="card">'+r.data.data.slice(0,12).map(row=>{
+    const pct=parseFloat(String(row[2]||'0').replace(/[%▲▼+\-]/g,''))||0;
+    const isUp=String(row[2]||'').includes('▲')||pct>0;
+    return `<div class="drow"><span class="dl">${row[0]||'--'}</span><span class="dv ${isUp?'up':'dn'}">${row[2]||'--'}</span></div>`;
+  }).join('')+'</div>';
 }
 
-function renderBigIndustry(r, c) {
-  if (!r?.ok) { c.innerHTML = '<div class="no-data">產業資料暫無</div>'; return; }
-  const d = r.data;
-  let html = '<div class="card"><div class="card-title">產業類股漲跌</div>';
-  if (d?.data?.length) {
-    html += d.data.slice(0,10).map(row =>
-      `<div class="drow"><span class="dl">${row[0]||'--'}</span>
-      <div class="dv ${parseFloat(row[2])>=0?'up':'dn'}">${row[2]||'--'}%</div></div>`
-    ).join('');
-  } else {
-    html += '<div class="no-data" style="font-size:12px">盤後更新</div>';
-  }
-  html += '</div>';
-  c.innerHTML = html;
+function renderBigDayTrade(c){
+  c.innerHTML=`<div class="card">
+    <div class="drow"><span class="dl">當沖交易統計</span><span class="dv up">盤後更新</span></div>
+    <div class="drow"><span class="dl">當沖比例</span><span class="dv">TWSE 盤後公布</span></div>
+    <div style="margin-top:8px;font-size:11px;color:var(--t3)">當沖資料約14:30後於 TWSE 官網公布，本系統自動同步。</div>
+  </div>`;
 }
 
-function renderBigDayTrade(r, c) {
-  c.innerHTML = `
-    <div class="card">
-      <div class="card-title">當沖統計資訊</div>
-      <div class="drow"><span class="dl">當沖交易比例</span><div class="dv up">TWSE 盤後公布</div></div>
-      <div class="drow"><span class="dl">當沖買賣金額</span><div class="dv">見 TWSE 官網</div></div>
-      <div class="drow"><span class="dl">當沖熱門股</span><div class="dv neu">成交量前段班</div></div>
-      <div style="margin-top:10px;font-size:11px;color:var(--t3)">
-        當沖相關資料於每日盤後14:30-16:00於 TWSE 官網公布。<br>
-        本系統透過 GAS 代理自動取得並更新。
-      </div>
+// ═══════════════════════════════════
+//  當沖專屬功能
+// ═══════════════════════════════════
+const FEATS = [
+  {ico:'⚡',nm:'瞬間買盤',ds:'即時捕捉大買單',plan:'free'},
+  {ico:'🔪',nm:'瞬間殺盤',ds:'追蹤大賣壓力',plan:'free'},
+  {ico:'📡',nm:'主力追蹤',ds:'機構資金動向',plan:'monthly'},
+  {ico:'🎯',nm:'分點追蹤',ds:'券商進出標示',plan:'monthly'},
+  {ico:'📊',nm:'盤中法人',ds:'即時三大法人',plan:'monthly'},
+  {ico:'🐋',nm:'大戶偵測',ds:'大戶買賣分析',plan:'monthly'},
+  {ico:'🔔',nm:'LINE通知',ds:'即時推播',plan:'yearly'},
+  {ico:'📈',nm:'獨家K線',ds:'當沖專屬指標',plan:'yearly'},
+];
+
+function renderFeatGrid() {
+  const plan=S.user?.plan||'free';
+  const trial=S.freeTrial;
+  const order=['free','monthly','yearly'];
+  const planIdx=order.indexOf(plan);
+  const g=document.getElementById('featGrid');
+  g.innerHTML=FEATS.map(f=>{
+    const reqIdx=order.indexOf(f.plan);
+    const locked=!trial&&planIdx<reqIdx;
+    return `<div class="feat-card" onclick="${locked?"showPay('月費',29)":""}">
+      ${locked?'<div class="feat-lock-overlay">🔒</div>':''}
+      <div class="feat-ico">${f.ico}</div>
+      <div class="feat-nm">${f.nm}</div>
+      <div class="feat-ds">${f.ds}</div>
     </div>`;
+  }).join('');
 }
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════
 //  LINE LOGIN
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════
 async function doLogin() {
   try {
-    if (!liff.isLoggedIn()) {
-      liff.login({ redirectUri: window.location.href });
-      return;
-    }
+    if (!liff.isLoggedIn()) { liff.login({redirectUri:window.location.href}); return; }
     const profile = await liff.getProfile();
     await processLogin(profile);
-  } catch(e) {
-    toast('⚠️ LINE 登入失敗：' + e.message);
-  }
+  } catch(e) { toast('⚠️ LINE 登入失敗：'+e.message); }
 }
 
 async function processLogin(profile) {
-  const r = await gas('login', { lineId: profile.userId, name: profile.displayName });
-  const user = {
-    lineId:  profile.userId,
-    name:    profile.displayName,
-    avatar:  profile.pictureUrl || '',
-    plan:    r?.plan || 'free',
-    phone:   r?.phone || '',
-    tgId:    r?.tgId || '',
-    isAdmin: r?.isAdmin || (r?.phone === CONFIG.ADMIN_PHONE),
+  const r=await gas('login',{lineId:profile.userId,name:profile.displayName});
+  const u={
+    lineId:profile.userId, name:profile.displayName,
+    avatar:profile.pictureUrl||'',
+    plan:r?.plan||'free', phone:r?.phone||'', tgId:r?.tgId||'',
+    isAdmin:profile.userId===C.ADMIN_ID||r?.isAdmin,
   };
-  localStorage.setItem('rdUser', JSON.stringify(user));
-  setLoggedIn(user);
-  // Sync watchlist from cloud
-  const wl = await gas('getWatchlist', { lineId: user.lineId });
-  if (wl?.ok && wl.codes?.length) {
-    S.watchlist = wl.codes;
-    saveWatch();
-    loadWatchlist();
+  S.freeTrial=r?.freeTrial!==false;
+  localStorage.setItem('rdUser',JSON.stringify(u));
+  setLoggedIn(u);
+  // 若新會員，彈出補填手機
+  if (r?.action==='register') {
+    document.getElementById('regName').value=u.name;
+    setTimeout(()=>document.getElementById('ovRegister').classList.add('on'),800);
   }
-  toast('✅ 歡迎，' + user.name);
+  // 同步雲端自選
+  const wl=await gas('getWatchlist',{lineId:u.lineId});
+  if(wl?.ok&&wl.codes?.length){S.watchlist=wl.codes;saveWatch();}
+  toast('✅ 歡迎，'+u.name);
 }
 
 function setLoggedIn(u) {
-  S.user = u; S.isLoggedIn = true;
-  S.isAdmin = u.phone === CONFIG.ADMIN_PHONE || u.isAdmin;
-  document.getElementById('memOut').style.display = 'none';
-  document.getElementById('memIn').style.display = 'block';
-  const av = document.getElementById('memAv');
-  if (u.avatar) { av.src = u.avatar; document.getElementById('avImg').src = u.avatar; document.getElementById('avWrap').style.display='block'; }
-  document.getElementById('memName').textContent = u.name;
-  document.getElementById('memSub').textContent = u.phone || 'LINE 會員';
-  const pt = document.getElementById('memPlan');
-  const planMap = { free:'免費會員', monthly:'月費會員', yearly:'年費會員' };
-  pt.textContent = S.isAdmin ? '系統管理員' : (planMap[u.plan] || '免費會員');
-  pt.className = 'plan-tag ' + (S.isAdmin ? 'pt-admin' : (u.plan==='yearly'?'pt-yearly': u.plan==='monthly'?'pt-monthly':'pt-free'));
-  if (u.tgId) document.getElementById('tgInput').value = u.tgId;
-  if (S.isAdmin) { document.getElementById('adminPanel').style.display = 'block'; loadAdminData(); }
+  S.user=u; S.isLoggedIn=true;
+  S.isAdmin=u.lineId===C.ADMIN_ID||u.isAdmin;
+  document.getElementById('memOut').style.display='none';
+  document.getElementById('memIn').style.display='block';
+  if(u.avatar){document.getElementById('avImg').src=u.avatar;document.getElementById('avWrap').style.display='block';}
+  const av=document.getElementById('memAv');
+  if(u.avatar) av.src=u.avatar; else av.src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="25" fill="%23ff2233"/><text y="33" x="25" text-anchor="middle" font-size="24" fill="white">龍</text></svg>';
+  document.getElementById('memName').textContent=u.name;
+  document.getElementById('memPhone').textContent=u.phone||'未填手機';
+  if(!u.phone) document.getElementById('phoneCard').style.display='block';
+  const pt=document.getElementById('memPlan');
+  const planMap={free:'免費試用',monthly:'月費會員',yearly:'年費會員'};
+  pt.textContent=S.isAdmin?'系統管理員':(planMap[u.plan]||'免費試用');
+  pt.className='plan-tag '+(S.isAdmin?'pt-admin':u.plan==='yearly'?'pt-yearly':u.plan==='monthly'?'pt-monthly':'pt-free');
+  if(u.tgId) document.getElementById('tgInput').value=u.tgId;
+  if(S.isAdmin){document.getElementById('adminPanel').style.display='block';loadAdminData();}
+  updateNotifyChannelUI();
+  renderFeatGrid();
+  // 隱藏試用徽章若已付費
+  if(u.plan!=='free') document.getElementById('trialBadge').style.display='none';
 }
 
 function doLogout() {
-  S.user = null; S.isLoggedIn = false; S.isAdmin = false;
+  S.user=null;S.isLoggedIn=false;S.isAdmin=false;
   localStorage.removeItem('rdUser');
-  document.getElementById('memIn').style.display = 'none';
-  document.getElementById('memOut').style.display = 'block';
-  document.getElementById('adminPanel').style.display = 'none';
-  document.getElementById('avWrap').style.display = 'none';
-  if (typeof liff !== 'undefined') {
-    try { liff.logout(); } catch(e) {}
-  }
+  document.getElementById('memIn').style.display='none';
+  document.getElementById('memOut').style.display='block';
+  document.getElementById('adminPanel').style.display='none';
+  document.getElementById('avWrap').style.display='none';
+  try{if(typeof liff!=='undefined')liff.logout();}catch(e){}
   toast('已登出');
+  updateNotifyChannelUI();
 }
 
-function gotoMember() { switchPg('member', document.querySelector('.nav-btn:last-child')); }
+async function savePhone() {
+  const phone=document.getElementById('phoneInput').value.trim();
+  if(!phone||!/^09\d{8}$/.test(phone)){toast('⚠️ 請輸入正確手機格式');return;}
+  if(!S.isLoggedIn){toast('請先登入');return;}
+  await gas('register',{lineId:S.user.lineId,phone});
+  S.user.phone=phone;localStorage.setItem('rdUser',JSON.stringify(S.user));
+  document.getElementById('memPhone').textContent=phone;
+  document.getElementById('phoneCard').style.display='none';
+  toast('✅ 手機已更新');
+}
 
 async function saveTg() {
-  const id = document.getElementById('tgInput').value.trim();
-  if (!id) { toast('請輸入 Telegram User ID'); return; }
-  if (S.isLoggedIn) {
-    const r = await gas('saveTg', { lineId: S.user.lineId, tgId: id });
-    toast(r?.ok ? '✅ Telegram ID 已儲存' : '⚠️ 儲存失敗');
-  } else {
-    localStorage.setItem('rdTgId', id);
-    toast('✅ 已暫存（登入後同步）');
-  }
+  const id=document.getElementById('tgInput').value.trim();
+  if(!id){toast('請輸入 Telegram ID');return;}
+  if(S.isLoggedIn){const r=await gas('saveTg',{lineId:S.user.lineId,tgId:id});toast(r?.ok?'✅ Telegram ID 已儲存':'⚠️ 儲存失敗');}
+  else{localStorage.setItem('rdTgId',id);toast('✅ 暫存（登入後同步）');}
 }
 
-// ═══════════════════════════════════════════
-//  ADMIN
-// ═══════════════════════════════════════════
+async function submitRegister() {
+  const phone=document.getElementById('regPhone').value.trim();
+  const name=document.getElementById('regName').value.trim();
+  if(!phone||!/^09\d{8}$/.test(phone)){toast('⚠️ 手機格式不正確（09xxxxxxxx）');return;}
+  if(S.isLoggedIn){
+    await gas('register',{lineId:S.user.lineId,phone,name});
+    S.user.phone=phone;if(name)S.user.name=name;
+    localStorage.setItem('rdUser',JSON.stringify(S.user));
+    document.getElementById('memPhone').textContent=phone;
+    document.getElementById('phoneCard').style.display='none';
+  }
+  closeOvId('ovRegister');
+  toast('✅ 資料已儲存，歡迎加入！');
+}
+
+// ═══════════════════════════════════
+//  管理員
+// ═══════════════════════════════════
 async function loadAdminData() {
-  const r = await gas('getMembers');
-  if (r?.ok && r.members?.length) {
-    document.getElementById('memTblBody').innerHTML = r.members.map(m => `
-      <tr>
-        <td>${m.name||'--'}</td>
-        <td>${m.plan||'free'}</td>
-        <td>${m.expiry||'-'}</td>
-        <td><span class="sbadge ${m.active?'sb-ok':'sb-no'}">${m.active?'啟用':'過期'}</span></td>
-      </tr>`).join('');
-  }
+  const r=await gas('getMembers');
+  if(!r?.ok) return;
+  document.getElementById('memTblBody').innerHTML=r.members.map(m=>`
+    <tr>
+      <td>${m.name||'--'}</td>
+      <td>${m.phone||'--'}</td>
+      <td><span class="sbadge ${m.isAdmin?'sb-admin':m.active?'sb-ok':'sb-no'}">${m.isAdmin?'管理員':m.plan}</span></td>
+      <td>${m.expiry||'-'}</td>
+      <td><span class="sbadge ${m.active?'sb-ok':'sb-no'}">${m.active?'啟用':'停用'}</span></td>
+      <td><button class="adm-act" onclick="openAdminPlan('${m.lineId}','${m.name||''}')" ${m.isAdmin?'disabled':''}>設定</button></td>
+    </tr>`).join('');
 }
 
-// ═══════════════════════════════════════════
-//  PAYMENT
-// ═══════════════════════════════════════════
+function openAdminPlan(lineId, name) {
+  S.adminTarget=lineId;
+  document.getElementById('adminTargetName').textContent='會員：'+name+' ('+lineId.substring(0,12)+'...)';
+  document.getElementById('apExpiry').value=new Date(Date.now()+30*86400000).toISOString().split('T')[0];
+  S.adminPlan=null;
+  ['ap-monthly','ap-yearly','ap-free'].forEach(id=>document.getElementById(id).className='frbtn');
+  document.getElementById('ovAdminPlan').classList.add('on');
+}
+
+function selAdminPlan(plan) {
+  S.adminPlan=plan;
+  ['ap-monthly','ap-yearly','ap-free'].forEach(id=>document.getElementById(id).className='frbtn');
+  document.getElementById('ap-'+plan).className='frbtn sel-buy';
+}
+
+async function confirmAdminPlan() {
+  if(!S.adminTarget||!S.adminPlan){toast('請選擇方案');return;}
+  const expiry=document.getElementById('apExpiry').value;
+  const r=await gas('adminSetPlan',{adminId:S.user.lineId,lineId:S.adminTarget,plan:S.adminPlan,expiry});
+  toast(r?.ok?'✅ 方案已更新':'⚠️ 失敗：'+r?.error);
+  closeOvId('ovAdminPlan');
+  loadAdminData();
+}
+
+// ═══════════════════════════════════
+//  付款
+// ═══════════════════════════════════
 function showPay(plan, amt) {
-  if (!S.isLoggedIn) { toast('請先登入會員'); return; }
-  S.selectedPlan = plan; S.selectedPlanAmt = amt;
-  document.getElementById('payTitle').textContent = `💳 訂閱${plan}方案 $${amt}`;
+  if(!S.isLoggedIn){toast('請先登入');return;}
+  S.selectedPlan=plan;S.selectedPlanAmt=amt;
+  document.getElementById('payTitle').textContent='💳 訂閱'+plan+'方案 $'+amt+'元';
   document.getElementById('ovPay').classList.add('on');
 }
 async function processPay(method) {
-  closeOvId('ovPay');
-  toast(`💳 ${method} 付款處理中...`);
-  const r = await gas('createOrder', { lineId: S.user?.lineId, plan: S.selectedPlan, method });
-  if (r?.ok) setTimeout(() => toast(`✅ 訂單 ${r.orderId} 已建立`), 1200);
+  closeOvId('ovPay');toast('💳 '+method+' 處理中...');
+  const r=await gas('createOrder',{lineId:S.user?.lineId,plan:S.selectedPlan,method});
+  if(r?.ok) setTimeout(()=>toast('✅ 訂單 '+r.orderId+' 已建立'),1200);
 }
 
-// ═══════════════════════════════════════════
-//  UTIL
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════
+//  偏好設定
+// ═══════════════════════════════════
+function openPref() {
+  const items=[{key:'watch',lbl:'⭐ 自選股',desc:'啟動時自動取得最新報價'},
+    {key:'market',lbl:'📊 市場大盤',desc:'進入市場頁自動載入指數'},
+    {key:'scan',lbl:'🔭 盤中掃描',desc:'啟動時預先掃描訊號'},
+    {key:'big',lbl:'🏛 大盤總覽',desc:'自動載入三大法人資料'}];
+  document.getElementById('prefList').innerHTML=items.map(it=>`
+    <div class="pref-item">
+      <div><div class="pref-lbl">${it.lbl}</div><div class="pref-desc">${it.desc}</div></div>
+      <div class="tgl ${S.pref[it.key]!==false?'on':''}" id="pref-${it.key}" onclick="togglePref('${it.key}')"></div>
+    </div>`).join('');
+  document.getElementById('ovPref').classList.add('on');
+}
+function togglePref(key){
+  S.pref[key]=!S.pref[key];
+  document.getElementById('pref-'+key).classList.toggle('on',S.pref[key]);
+}
+function savePref(){localStorage.setItem('rdPref',JSON.stringify(S.pref));closeOvId('ovPref');toast('✅ 偏好已儲存');}
+
+// ═══════════════════════════════════
+//  Navigation
+// ═══════════════════════════════════
 function switchPg(name, btn) {
-  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
-  document.getElementById('pg-' + name).classList.add('on');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+name).classList.add('on');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  // Lazy load
-  if (name === 'big') loadBigTab('台灣指數');
-  if (name === 'scan') loadScanByMode(S.scanMode);
-  if (name === 'notify') renderNotifyList();
+  // 懶載入
+  if(name==='market'&&!Object.keys(S.priceCache).length){loadIndex();loadMarket();}
+  else if(name==='market') loadIndex();
+  if(name==='scan') loadScanByMode(S.scanMode);
+  if(name==='big') loadBigTab(S.bigTab);
+  if(name==='notify') renderNotifyList();
+  if(name==='member') renderFeatGrid();
 }
 
-function openOv(id) { document.getElementById(id).classList.add('on'); }
-function closeOvId(id) { document.getElementById(id).classList.remove('on'); }
-function closeOv(e, id) { if(e.target===document.getElementById(id)) closeOvId(id); }
+// ═══════════════════════════════════
+//  Overlay
+// ═══════════════════════════════════
+function closeOvId(id){document.getElementById(id).classList.remove('on');}
+function closeOv(e,id){if(e.target===document.getElementById(id))closeOvId(id);}
 
-let toastTmr;
+// ═══════════════════════════════════
+//  Toast & Utils
+// ═══════════════════════════════════
+let toastT;
 function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('on');
-  clearTimeout(toastTmr);
-  toastTmr = setTimeout(() => t.classList.remove('on'), 2800);
-}
-
-function formatChg(v) {
-  const s = v >= 0 ? '▲' : '▼';
-  return `${s} ${Math.abs(v).toFixed(2)}`;
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800);
 }
 
 function fmtVol(v) {
-  if (!v || v === 0) return '--';
-  if (v >= 100000000) return (v/100000000).toFixed(1)+'億';
-  if (v >= 10000) return (v/10000).toFixed(1)+'萬';
-  return v.toLocaleString();
+  if(!v||v===0)return '--';
+  if(v>=100000000)return (v/100000000).toFixed(1)+'億';
+  if(v>=10000)return (v/10000).toFixed(1)+'萬';
+  return Number(v).toLocaleString();
 }
 </script>
 </body>
