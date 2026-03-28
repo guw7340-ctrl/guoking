@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>當沖圍中紅龍 VER1.1</title>
+<title>當沖圍中紅龍 v1.2</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -19,10 +19,11 @@
   --bdr:rgba(255,255,255,.06);--bdrr:rgba(255,34,51,.35);--bdrg:rgba(0,230,118,.35);
   --mono:'Share Tech Mono',monospace;--font:'Noto Sans TC',sans-serif;
   --r:12px;--rs:8px;--safe:env(safe-area-inset-bottom,0px);
-  --fz: 14px;
+  --fz: 16px;
+  --fz-scale: 1;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--t1);font-family:var(--font);font-size:var(--fz)}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--t1);font-family:var(--font);font-size:calc(var(--fz) * var(--fz-scale))}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:
     radial-gradient(ellipse at 15% 50%,rgba(255,34,51,.05) 0,transparent 55%),
@@ -48,17 +49,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .logo{display:flex;align-items:center;gap:8px}
 .logo-box{width:28px;height:28px;background:linear-gradient(135deg,var(--red),#ff6533);
   border-radius:7px;display:flex;align-items:center;justify-content:center;
-  font-size:15px;box-shadow:0 0 10px rgba(255,34,51,.5);flex-shrink:0}
-.logo-txt{font-size:12px;font-weight:800;letter-spacing:.5px;
+  font-size:0.9375rem;box-shadow:0 0 10px rgba(255,34,51,.5);flex-shrink:0}
+.logo-txt{font-size:0.75rem;font-weight:800;letter-spacing:.5px;
   background:linear-gradient(90deg,var(--red),var(--gold));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.ver-tag{font-size:9px;background:var(--rb);color:var(--red);border:1px solid var(--bdrr);
+.ver-tag{font-size:0.5625rem;background:var(--rb);color:var(--red);border:1px solid var(--bdrr);
   border-radius:4px;padding:1px 4px;font-weight:700;margin-left:4px;-webkit-text-fill-color:var(--red)}
 .hdr-r{display:flex;align-items:center;gap:6px}
-.mkt-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;letter-spacing:1px}
+.mkt-badge{font-size:0.5625rem;font-weight:700;padding:2px 6px;border-radius:20px;letter-spacing:1px}
 .mkt-open{background:var(--gg);color:var(--grn);border:1px solid var(--grn)}
 .mkt-close{background:rgba(100,100,100,.12);color:#555;border:1px solid #2a2a2a}
-.trial-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;
+.trial-badge{font-size:0.5625rem;font-weight:700;padding:2px 6px;border-radius:20px;
   background:var(--gdg);color:var(--gold);border:1px solid rgba(255,215,0,.4)}
 .av-wrap{width:26px;height:26px;border-radius:50%;overflow:hidden;
   border:1.5px solid var(--bdrr);cursor:pointer}
@@ -71,7 +72,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .nav-btn::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
   width:0;height:2px;border-radius:0 0 2px 2px;background:var(--red);transition:width .25s}
 .nav-btn.on{color:var(--red)}.nav-btn.on::before{width:20px}
-.nav-ico{font-size:18px}.nav-lbl{font-size:9px;font-weight:600}
+.nav-ico{font-size:1.125rem}.nav-lbl{font-size:0.5625rem;font-weight:600}
 
 /* ── Pages ── */
 .pg{display:none;padding:10px 10px 78px;animation:fadeIn .2s ease}
@@ -81,7 +82,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 /* ── Cards & Sections ── */
 .card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:12px}
 .card+.card{margin-top:7px}
-.sec{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:2px;
+.sec{font-size:0.625rem;font-weight:700;color:var(--t3);letter-spacing:2px;
   text-transform:uppercase;margin:12px 0 7px;display:flex;align-items:center;gap:7px}
 .sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bdr),transparent)}
 
@@ -91,13 +92,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   margin-bottom:8px;position:relative;overflow:hidden}
 .idx-box::after{content:'指';position:absolute;right:-4px;top:-6px;
   font-size:64px;font-weight:900;color:rgba(255,34,51,.04);pointer-events:none}
-.idx-lbl{font-size:10px;color:var(--t3);letter-spacing:2px}
-.idx-val{font-family:var(--mono);font-size:32px;font-weight:900;color:var(--red);
+.idx-lbl{font-size:0.625rem;color:var(--t3);letter-spacing:2px}
+.idx-val{font-family:var(--mono);font-size:2rem;font-weight:900;color:var(--red);
   text-shadow:0 0 14px rgba(255,34,51,.4);margin:2px 0;min-height:40px}
-.idx-chg{font-size:12px;font-weight:700}
+.idx-chg{font-size:0.75rem;font-weight:700}
 .idx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:10px}
 .idx-cell{background:rgba(255,255,255,.03);border-radius:7px;padding:6px;text-align:center}
-.idx-cv{font-size:12px;font-weight:700;font-family:var(--mono)}
+.idx-cv{font-size:0.75rem;font-weight:700;font-family:var(--mono)}
 .idx-cl{font-size:9px;color:var(--t3);margin-top:1px}
 
 /* ── Stock cards ── */
@@ -107,18 +108,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .sc.up::before{background:var(--red)}.sc.dn::before{background:var(--grn)}
 .sc:hover{border-color:var(--bdrr);background:var(--bg3);transform:translateX(2px)}
 .sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px}
-.sc-name{font-size:14px;font-weight:700}
-.sc-code{font-size:10px;color:var(--t3);margin-top:1px}
-.sc-pv{font-family:var(--mono);font-size:19px;font-weight:700;text-align:right}
-.sc-chg{font-size:11px;font-weight:600;text-align:right}
+.sc-name{font-size:0.875rem;font-weight:700}
+.sc-code{font-size:0.625rem;color:var(--t3);margin-top:1px}
+.sc-pv{font-family:var(--mono);font-size:1.1875rem;font-weight:700;text-align:right}
+.sc-chg{font-size:0.6875rem;font-weight:600;text-align:right}
 .sc-bot{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
 .ms{background:rgba(255,255,255,.03);border-radius:5px;padding:3px 5px}
-.ms-l{font-size:8px;color:var(--t3)}.ms-v{font-size:10px;font-weight:600;color:var(--t2)}
+.ms-l{font-size:0.5rem;color:var(--t3)}.ms-v{font-size:0.625rem;font-weight:600;color:var(--t2)}
 /* 股票操作按鈕 */
 .sc-actions{position:absolute;right:8px;top:8px;display:flex;gap:4px;opacity:0;transition:opacity .2s}
 .sc:hover .sc-actions{opacity:1}
 .sc-act{background:var(--bg4);border:1px solid var(--bdr);border-radius:5px;
-  padding:3px 6px;font-size:10px;cursor:pointer;transition:all .15s;color:var(--t2)}
+  padding:3px 6px;font-size:0.625rem;cursor:pointer;transition:all .15s;color:var(--t2)}
 .sc-act:hover{border-color:var(--bdrr);color:var(--red)}
 .sc-act.del:hover{border-color:var(--bdrg);color:var(--grn)}
 
@@ -126,7 +127,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .spin{width:16px;height:16px;border:2px solid var(--bdr);border-top-color:var(--red);
   border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-row{text-align:center;padding:24px 0;color:var(--t3);font-size:12px}
+.loading-row{text-align:center;padding:24px 0;color:var(--t3);font-size:0.75rem}
 
 /* ── Search ── */
 .srch{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
@@ -134,14 +135,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   transition:border-color .2s}
 .srch:focus-within{border-color:var(--bdrr)}
 .srch input{flex:1;background:none;border:none;outline:none;color:var(--t1);
-  font-size:14px;font-family:var(--font)}
+  font-size:0.875rem;font-family:var(--font)}
 .srch input::placeholder{color:var(--t3)}
 
 /* ── Tabs ── */
 .tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:7px;margin-bottom:9px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex-shrink:0;background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;
-  padding:4px 11px;font-size:11px;font-weight:600;cursor:pointer;transition:all .18s;
+  padding:4px 11px;font-size:0.6875rem;font-weight:600;cursor:pointer;transition:all .18s;
   color:var(--t2);white-space:nowrap}
 .tab.on{background:var(--red);border-color:var(--red);color:#fff}
 
@@ -150,9 +151,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
   margin-bottom:5px;cursor:pointer;transition:all .18s}
 .sli:hover{border-color:var(--bdrr)}
-.sli-n{font-size:13px;font-weight:700}.sli-c{font-size:10px;color:var(--t3)}
-.sli-p{font-family:var(--mono);font-size:13px;font-weight:700;text-align:right}
-.sli-ch{font-size:11px;font-weight:600;text-align:right}
+.sli-n{font-size:0.8125rem;font-weight:700}.sli-c{font-size:0.625rem;color:var(--t3)}
+.sli-p{font-family:var(--mono);font-size:0.8125rem;font-weight:700;text-align:right}
+.sli-ch{font-size:0.6875rem;font-weight:600;text-align:right}
 
 /* ── Overlays ── */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;
@@ -164,7 +165,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   animation:slideUp .28s cubic-bezier(.34,1.56,.64,1)}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .mdl-hnd{width:34px;height:4px;background:var(--t3);border-radius:2px;margin:0 auto 12px}
-.mdl-title{font-size:14px;font-weight:700;margin-bottom:12px}
+.mdl-title{font-size:0.875rem;font-weight:700;margin-bottom:12px}
 .mdl-x{position:absolute;top:13px;right:13px;background:none;border:none;
   color:var(--t3);font-size:20px;cursor:pointer;width:28px;height:28px;
   display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .18s}
@@ -175,14 +176,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .cf-btn{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
   padding:10px;cursor:pointer;transition:all .18s;text-align:left}
 .cf-btn:hover,.cf-btn.on{border-color:var(--bdrr);background:var(--rb)}
-.cf-ico{font-size:18px;margin-bottom:2px}.cf-nm{font-size:11px;font-weight:700}
-.cf-ds{font-size:9px;color:var(--t3);margin-top:1px}
+.cf-ico{font-size:1.125rem;margin-bottom:2px}.cf-nm{font-size:0.6875rem;font-weight:700}
+.cf-ds{font-size:0.5625rem;color:var(--t3);margin-top:1px}
 
 /* ── Data rows ── */
 .drow{display:flex;justify-content:space-between;align-items:center;
   padding:8px 0;border-bottom:1px solid var(--bdr)}
 .drow:last-child{border-bottom:none}
-.dl{font-size:12px;color:var(--t2)}.dv{font-size:12px;font-weight:700;font-family:var(--mono)}
+.dl{font-size:0.75rem;color:var(--t2)}.dv{font-size:0.75rem;font-weight:700;font-family:var(--mono)}
 
 /* ── Colors ── */
 .up{color:var(--red)}.dn{color:var(--grn)}.neu{color:var(--t2)}
@@ -190,8 +191,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 /* ── Notify cards ── */
 .nf-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
   padding:11px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
-.nf-nm{font-size:12px;font-weight:700}.nf-cond{font-size:10px;color:var(--t2);margin-top:2px}
-.nbadge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px}
+.nf-nm{font-size:0.75rem;font-weight:700}.nf-cond{font-size:0.625rem;color:var(--t2);margin-top:2px}
+.nbadge{font-size:0.5625rem;font-weight:700;padding:2px 6px;border-radius:20px}
 .nb-buy{background:var(--rb);color:var(--red);border:1px solid rgba(255,34,51,.3)}
 .nb-sell{background:var(--gg);color:var(--grn);border:1px solid rgba(0,230,118,.3)}
 .tgl{width:36px;height:20px;background:var(--bg3);border-radius:10px;
@@ -203,14 +204,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 /* ── Forms ── */
 .frow{margin-bottom:9px}
-.flbl{font-size:11px;color:var(--t3);margin-bottom:4px}
+.flbl{font-size:0.6875rem;color:var(--t3);margin-bottom:4px}
 .finp{width:100%;background:var(--bg0);border:1px solid var(--bdr);border-radius:var(--rs);
-  padding:9px 11px;color:var(--t1);font-size:13px;font-family:var(--font);
+  padding:9px 11px;color:var(--t1);font-size:0.8125rem;font-family:var(--font);
   outline:none;transition:border-color .18s}
 .finp:focus{border-color:var(--bdrr)}
 .fradio{display:flex;gap:6px}
 .frbtn{flex:1;background:var(--bg0);border:1px solid var(--bdr);border-radius:var(--rs);
-  padding:7px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;
+  padding:7px;text-align:center;font-size:0.6875rem;font-weight:700;cursor:pointer;
   transition:all .18s;color:var(--t2)}
 .frbtn.sel-buy{border-color:var(--red);background:var(--rb);color:var(--red)}
 .frbtn.sel-sell{border-color:var(--grn);background:var(--gg);color:var(--grn)}
@@ -221,24 +222,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 /* ── Buttons ── */
 .btn-red{background:linear-gradient(135deg,var(--red),#ff5533);border:none;color:#fff;
-  font-size:13px;font-weight:700;padding:11px;border-radius:var(--rs);
+  font-size:0.8125rem;font-weight:700;padding:11px;border-radius:var(--rs);
   cursor:pointer;width:100%;font-family:var(--font);transition:opacity .18s}
 .btn-red:hover{opacity:.88}
 .btn-outline{background:none;border:1px solid var(--bdr);border-radius:var(--rs);
-  padding:9px;font-size:12px;color:var(--t2);cursor:pointer;width:100%;
+  padding:9px;font-size:0.75rem;color:var(--t2);cursor:pointer;width:100%;
   font-family:var(--font);transition:all .18s}
 .btn-outline:hover{border-color:var(--bdrr);color:var(--t1)}
-.btn-line{background:#06C755;border:none;color:#fff;font-size:13px;font-weight:700;
+.btn-line{background:#06C755;border:none;color:#fff;font-size:0.8125rem;font-weight:700;
   padding:12px;border-radius:var(--rs);cursor:pointer;width:100%;
   display:flex;align-items:center;justify-content:center;gap:8px;
   font-family:var(--font);transition:background .18s}
 .btn-line:hover{background:#05a347}
 .btn-sm{background:var(--rb);border:1px solid var(--bdrr);color:var(--red);
-  font-size:10px;font-weight:700;padding:4px 9px;border-radius:5px;
+  font-size:0.625rem;font-weight:700;padding:4px 9px;border-radius:5px;
   cursor:pointer;transition:all .18s;white-space:nowrap}
 .btn-sm:hover{background:var(--red);color:#fff}
 .btn-gold{background:linear-gradient(135deg,var(--gold),#ff8c00);border:none;
-  color:#000;font-size:13px;font-weight:700;padding:11px;border-radius:var(--rs);
+  color:#000;font-size:0.8125rem;font-weight:700;padding:11px;border-radius:var(--rs);
   cursor:pointer;width:100%;font-family:var(--font)}
 
 /* ── Scan ── */
@@ -246,19 +247,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .scan-opt{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
   padding:10px;cursor:pointer;transition:all .18s;text-align:center}
 .scan-opt.on{border-color:var(--gold);background:rgba(255,215,0,.05)}
-.so-ico{font-size:20px;margin-bottom:2px}.so-nm{font-size:11px;font-weight:700}
+.so-ico{font-size:1.25rem;margin-bottom:2px}.so-nm{font-size:0.6875rem;font-weight:700}
 .so-ds{font-size:9px;color:var(--t3)}
 .sig-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);
   padding:10px;margin-bottom:5px;display:flex;align-items:center;gap:9px;cursor:pointer}
 .sig-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;
   justify-content:center;font-size:16px;flex-shrink:0}
 .si-buy{background:var(--rb)}.si-sell{background:var(--gg)}.si-neu{background:var(--blg)}
-.sig-inf{flex:1}.si-nm{font-size:12px;font-weight:700}
-.si-dt{font-size:10px;color:var(--t2);margin-top:1px}.si-tm{font-size:9px;color:var(--t3)}
-.si-sc{font-family:var(--mono);font-size:16px;font-weight:700}
+.sig-inf{flex:1}.si-nm{font-size:0.75rem;font-weight:700}
+.si-dt{font-size:0.625rem;color:var(--t2);margin-top:1px}.si-tm{font-size:0.5625rem;color:var(--t3)}
+.si-sc{font-family:var(--mono);font-size:1rem;font-weight:700}
 .strat-chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg3);
   border:1px solid var(--bdr);border-radius:20px;padding:3px 9px;
-  font-size:10px;font-weight:600;color:var(--t2);margin:2px;cursor:pointer}
+  font-size:0.625rem;font-weight:600;color:var(--t2);margin:2px;cursor:pointer}
 .strat-chip.on{background:var(--rb);border-color:var(--bdrr);color:var(--red)}
 
 /* ── Member ── */
@@ -267,8 +268,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   text-align:center;margin-bottom:9px}
 .mem-av{width:64px;height:64px;border-radius:50%;border:2px solid var(--red);
   margin:0 auto 9px;display:block;object-fit:cover}
-.mem-name{font-size:16px;font-weight:700}
-.plan-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;
+.mem-name{font-size:1rem;font-weight:700}
+.plan-tag{display:inline-block;font-size:0.625rem;font-weight:700;padding:2px 9px;
   border-radius:20px;margin-top:4px;letter-spacing:1px}
 .pt-free{background:var(--rb);border:1px solid var(--bdrr);color:var(--red)}
 .pt-monthly{background:var(--blg);border:1px solid rgba(0,180,255,.3);color:var(--blue)}
@@ -278,30 +279,30 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .plan-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);
   padding:12px;text-align:center;cursor:pointer;transition:all .18s}
 .plan-card.rec{border-color:var(--gold);background:rgba(255,215,0,.04)}
-.pl-nm{font-size:13px;font-weight:700}.pl-pr{font-family:var(--mono);font-size:20px;font-weight:900;color:var(--red);margin:4px 0}
-.pl-pd{font-size:9px;color:var(--t3)}.pl-ft{font-size:10px;color:var(--t2);margin-top:6px;line-height:1.7}
+.pl-nm{font-size:0.8125rem;font-weight:700}.pl-pr{font-family:var(--mono);font-size:1.25rem;font-weight:900;color:var(--red);margin:4px 0}
+.pl-pd{font-size:0.5625rem;color:var(--t3)}.pl-ft{font-size:0.625rem;color:var(--t2);margin-top:6px;line-height:1.7}
 
 /* ── Admin ── */
 .adm-box{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);
   border-radius:var(--r);padding:12px;margin-bottom:9px}
-.adm-title{font-size:12px;font-weight:700;color:var(--purple);margin-bottom:10px}
-.tbl{width:100%;border-collapse:collapse;font-size:10px}
+.adm-title{font-size:0.75rem;font-weight:700;color:var(--purple);margin-bottom:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:0.625rem}
 .tbl th{color:var(--t3);text-align:left;padding:5px 7px;border-bottom:1px solid var(--bdr)}
 .tbl td{padding:7px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--t2)}
-.sbadge{font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px}
+.sbadge{font-size:0.5625rem;font-weight:700;padding:2px 5px;border-radius:8px}
 .sb-ok{background:var(--gg);color:var(--grn)}.sb-no{background:rgba(80,80,80,.15);color:#555}
 .sb-admin{background:var(--plg);color:var(--purple)}
 /* 管理員設定方案 */
-.adm-act{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;cursor:pointer;
+.adm-act{font-size:0.5625rem;font-weight:700;padding:2px 6px;border-radius:5px;cursor:pointer;
   background:var(--plg);border:1px solid rgba(168,85,247,.3);color:var(--purple)}
 
 /* ── K 線圖 ── */
 .kline-wrap{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);
   padding:12px;margin-top:8px;position:relative}
 .kline-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.kline-name{font-size:14px;font-weight:700}
+.kline-name{font-size:0.875rem;font-weight:700}
 .kline-tabs{display:flex;gap:4px}
-.kline-tab{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;cursor:pointer;
+.kline-tab{font-size:0.5625rem;font-weight:700;padding:2px 7px;border-radius:10px;cursor:pointer;
   background:var(--bg3);border:1px solid var(--bdr);color:var(--t3);transition:all .15s}
 .kline-tab.on{background:var(--red);border-color:var(--red);color:#fff}
 .kline-canvas-wrap{position:relative;height:260px}
@@ -309,12 +310,12 @@ canvas#klineChart{width:100%!important;height:100%!important}
 /* 當沖指標列 */
 .dt-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px}
 .dt-stat{background:var(--bg3);border-radius:7px;padding:7px;text-align:center}
-.dt-stat-v{font-size:13px;font-weight:700;font-family:var(--mono)}
-.dt-stat-l{font-size:9px;color:var(--t3);margin-top:1px}
+.dt-stat-v{font-size:0.8125rem;font-weight:700;font-family:var(--mono)}
+.dt-stat-l{font-size:0.5625rem;color:var(--t3);margin-top:1px}
 /* 量能條 */
 .vol-bar-wrap{margin-top:8px}
 .vol-bar-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
-.vol-bar-lbl{width:28px;font-size:9px;color:var(--t3);text-align:right}
+.vol-bar-lbl{width:28px;font-size:0.5625rem;color:var(--t3);text-align:right}
 .vol-bar{flex:1;height:10px;background:var(--bg3);border-radius:5px;overflow:hidden}
 .vol-bar-fill{height:100%;border-radius:5px;transition:width .5s ease}
 .vb-red{background:linear-gradient(90deg,var(--red2),var(--red))}
@@ -324,8 +325,8 @@ canvas#klineChart{width:100%!important;height:100%!important}
 .pref-item{display:flex;justify-content:space-between;align-items:center;
   padding:9px 0;border-bottom:1px solid var(--bdr)}
 .pref-item:last-child{border-bottom:none}
-.pref-lbl{font-size:12px;font-weight:600}
-.pref-desc{font-size:10px;color:var(--t3);margin-top:2px}
+.pref-lbl{font-size:0.75rem;font-weight:600}
+.pref-desc{font-size:0.625rem;color:var(--t3);margin-top:2px}
 
 /* ── Day-trade member features ── */
 .feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
@@ -334,14 +335,14 @@ canvas#klineChart{width:100%!important;height:100%!important}
 .feat-card:hover{border-color:var(--bdrr)}
 .feat-card .lock{position:absolute;top:5px;right:7px;font-size:11px}
 .feat-ico{font-size:22px;margin-bottom:3px}
-.feat-nm{font-size:11px;font-weight:700}.feat-ds{font-size:9px;color:var(--t3);margin-top:1px}
+.feat-nm{font-size:0.6875rem;font-weight:700}.feat-ds{font-size:0.5625rem;color:var(--t3);margin-top:1px}
 .feat-lock-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);
   border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:18px}
 
 /* ── Toast ── */
 #toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%) translateY(14px);
   background:rgba(10,15,23,.97);border:1px solid var(--bdr);border-radius:var(--rs);
-  padding:8px 14px;font-size:12px;font-weight:600;z-index:500;opacity:0;
+  padding:8px 14px;font-size:0.75rem;font-weight:600;z-index:500;opacity:0;
   transition:all .22s;white-space:nowrap;pointer-events:none;max-width:90vw}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -354,10 +355,9 @@ canvas#klineChart{width:100%!important;height:100%!important}
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pulse 1.4s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .ld-sub{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--t3)}
-.ld-bar{width:90px;height:2px;background:var(--bg3);border-radius:1px;overflow:hidden}
-.ld-fill{height:100%;background:var(--red);animation:ldBar 1.5s ease-in-out infinite}
-@keyframes ldBar{0%{width:0}80%{width:100%}100%{width:100%;opacity:0}}
-.ld-msg{font-size:11px;color:var(--t3)}
+.ld-bar{width:200px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.ld-fill{height:100%;background:var(--red);width:0%;transition:width 0.3s ease}
+#ldMsg{font-size:0.8125rem;color:var(--t3)}
 .err-banner{background:var(--rb);border:1px solid var(--bdrr);border-radius:var(--rs);
   padding:9px 11px;font-size:11px;color:var(--red);margin-bottom:8px;line-height:1.6}
 .no-data{text-align:center;padding:28px 0;color:var(--t3);font-size:12px}
@@ -369,10 +369,10 @@ canvas#klineChart{width:100%!important;height:100%!important}
 <div id="loading">
   <div class="ld-logo">龍</div>
   <div style="font-size:18px;font-weight:900">當沖圍中紅龍</div>
-  <div class="ld-sub">VER1.1 · DAYTRADING SYSTEM</div>
+  <div class="ld-sub">v1.2 · DAYTRADING SYSTEM</div>
   <div style="background:var(--rg);border:1px solid var(--bdrr);border-radius:6px;padding:4px 12px;font-size:10px;color:var(--red);font-weight:700">🎁 免費試用中</div>
   <div class="ld-bar"><div class="ld-fill"></div></div>
-  <div class="ld-msg" id="ldMsg">初始化中...</div>
+  <div id="ldMsg" style="font-size:11px;color:var(--t3)">初始化中...</div>
 </div>
 
 <div id="toast"></div>
@@ -382,7 +382,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
 <div id="hdr">
   <div class="logo">
     <div class="logo-box">龍</div>
-    <div class="logo-txt">當沖圍中紅龍<span class="ver-tag">VER1.1</span></div>
+    <div class="logo-txt">當沖圍中紅龍<span class="ver-tag">v1.2</span></div>
   </div>
   <div class="hdr-r">
     <div class="trial-badge" id="trialBadge">🎁 試用中</div>
@@ -866,7 +866,7 @@ function onAlertClose(res) {
 }
 
 function updateFontSize(val) {
-  document.documentElement.style.setProperty('--fz', (14 * val) + 'px');
+  document.documentElement.style.setProperty('--fz-scale', val);
   localStorage.setItem('rdFontSize', val);
 }
 
@@ -890,7 +890,7 @@ async function refreshWatchlist() {
 //  INIT
 // ═══════════════════════════════════
 window.addEventListener('load', async () => {
-  ldMsg('初始化中...');
+  ldMsg('初始化系統...', 10);
 
   // 偏好設定
   S.pref = JSON.parse(localStorage.getItem('rdPref') || '{"watch":true,"market":false,"scan":false,"big":false}');
@@ -905,11 +905,11 @@ window.addEventListener('load', async () => {
   }
 
   // LIFF init
-  ldMsg('連線 LINE LIFF...');
+  ldMsg('連線 LINE LIFF...', 30);
   try {
     await liff.init({ liffId: C.LIFF_ID });
     if (liff.isLoggedIn()) {
-      ldMsg('取得 LINE 資料...');
+      ldMsg('取得 LINE 資料...', 40);
       const profile = await liff.getProfile();
       await processLogin(profile);
     }
@@ -919,39 +919,55 @@ window.addEventListener('load', async () => {
   const stored = localStorage.getItem('rdUser');
   if (stored && !S.isLoggedIn) setLoggedIn(JSON.parse(stored));
 
+  ldMsg('同步雲端資料...', 50);
+  const r = await gas('login', S.user);
+  if (r?.ok) {
+    S.user = { ...S.user, ...r.user };
+    S.isAdmin = S.user.lineId === C.ADMIN_ID || r.isAdmin;
+  }
+
   checkMarket();
   updateNotifyChannelUI();
 
-  // ★ 優先載入（用戶選擇的頁面）
+  // ★ 優先載入
+  ldMsg('載入自選股...', 70);
   if (S.pref.watch !== false) {
-    ldMsg('取得自選股報價...');
     await loadWatchlist();
   } else {
     document.getElementById('watchContainer').innerHTML =
       '<div class="no-data">點擊下方 ⭐ 切換到自選股即可載入</div>';
   }
 
+  ldMsg('預載市場資訊...', 90);
+  loadIndex();
+  loadMarket();
+
+  ldMsg('完成', 100);
   // 隱藏 loading
   setTimeout(() => {
     const ld = document.getElementById('loading');
     ld.style.opacity = '0';
     setTimeout(() => ld.style.display='none', 400);
+    renderNotifyList();
+    renderFeatGrid();
   }, 300);
 
   // 其餘延遲載入
   setTimeout(() => {
-    if (S.pref.market) loadIndex();
     if (S.pref.scan)   loadScanByMode('主力異動');
     if (S.pref.big)    loadBigTab('台灣指數');
-    renderNotifyList();
-    renderFeatGrid();
   }, 500);
 
   // 自動刷新（開市中每30秒）
   setInterval(autoRefresh, 30000);
 });
 
-function ldMsg(m) { document.getElementById('ldMsg').textContent = m; }
+function ldMsg(m, pct) {
+  const el = document.getElementById('ldMsg');
+  if (el) el.textContent = m;
+  const fill = document.querySelector('.ld-fill');
+  if (fill && pct !== undefined) fill.style.width = pct + '%';
+}
 
 function checkMarket() {
   const now = new Date();
@@ -1034,7 +1050,7 @@ function renderWatchlist(prices) {
       </div>
       <div class="sc-top">
         <div>
-          <div class="sc-name">${p.name||code}</div>
+          <div class="sc-name">${p.name || S.nameCache[code] || code}</div>
           <div class="sc-code">${p.code}</div>
         </div>
         <div>
@@ -1410,8 +1426,8 @@ function renderMktList(prices) {
   if(q) list=list.filter(p=>p.code?.includes(q)||p.name?.includes(q));
   document.getElementById('mktList').innerHTML=list.map(p=>{
     const up=p.change>=0;
-    return `<div class="sli" onclick="openCore('${p.code}','${p.name||p.code}',${p.price})">
-      <div><div class="sli-n">${p.name||p.code}</div><div class="sli-c">${p.code}</div></div>
+    return `<div class="sli" onclick="openCore('${p.code}','${p.name || S.nameCache[p.code] || p.code}',${p.price})">
+      <div><div class="sli-n">${p.name || S.nameCache[p.code] || p.code}</div><div class="sli-c">${p.code}</div></div>
       <div>
         <div class="sli-p ${up?'up':'dn'}">${p.price?.toFixed(2)||'--'}</div>
         <div class="sli-ch ${up?'up':'dn'}">${up?'▲':'▼'} ${Math.abs(p.pct||0).toFixed(2)}%</div>
