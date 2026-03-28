@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>當沖圍中紅龍 v1.4</title>
+<title>當沖圍中紅龍 v1.5</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap');
 :root{
@@ -369,7 +370,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
 <div id="loading">
   <div class="ld-logo">龍</div>
   <div style="font-size:18px;font-weight:900">當沖圍中紅龍</div>
-  <div class="ld-sub">v1.4 · DAYTRADING SYSTEM</div>
+  <div class="ld-sub">v1.5 · DAYTRADING SYSTEM</div>
   <div style="background:var(--rg);border:1px solid var(--bdrr);border-radius:6px;padding:4px 12px;font-size:10px;color:var(--red);font-weight:700">🎁 免費試用中</div>
   <div class="ld-bar"><div class="ld-fill"></div></div>
   <div style="display:flex;justify-content:space-between;width:200px;margin-top:-5px">
@@ -386,7 +387,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
 <div id="hdr">
   <div class="logo">
     <div class="logo-box">龍</div>
-    <div class="logo-txt">當沖圍中紅龍<span class="ver-tag">v1.4</span></div>
+    <div class="logo-txt">當沖圍中紅龍<span class="ver-tag">v1.5</span></div>
   </div>
   <div class="hdr-r">
     <div id="clock" style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-right:8px;font-weight:700"></div>
@@ -415,7 +416,16 @@ canvas#klineChart{width:100%!important;height:100%!important}
 
 <!-- ═════ PAGE: 市場 ═════ -->
 <div class="pg" id="pg-market">
-  <div class="idx-box">
+  <div class="srch"><span>🔍</span><input type="text" id="mktSearch" placeholder="搜尋股票代號或名稱..." oninput="onSearch(this.value)"></div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <div class="tabs" id="catTabs" style="flex:1;margin:0;overflow-x:auto;white-space:nowrap;scrollbar-width:none">
+      <!-- 動態載入 -->
+    </div>
+    <button class="btn-sm" style="width:40px;padding:0;flex-shrink:0" onclick="openManageCat()">⚙️</button>
+  </div>
+  
+  <div class="sec">分類指標股</div>
+  <div class="idx-box" style="margin-top:0">
     <div class="idx-lbl">加權指數 TAIEX</div>
     <div class="idx-val" id="idxVal"><div class="spin"></div></div>
     <div class="idx-chg neu" id="idxChg">-- </div>
@@ -425,14 +435,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
       <div class="idx-cell"><div class="idx-cv neu" id="idxVol">--</div><div class="idx-cl">成交(億)</div></div>
     </div>
   </div>
-  <div class="srch"><span>🔍</span><input type="text" id="mktSearch" placeholder="搜尋股票代號或名稱..." oninput="onSearch(this.value)"></div>
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-    <div class="tabs" id="catTabs" style="flex:1;margin:0;overflow-x:auto;white-space:nowrap;scrollbar-width:none">
-      <!-- 動態載入 -->
-    </div>
-    <button class="btn-sm" style="width:40px;padding:0;flex-shrink:0" onclick="openManageCat()">⚙️</button>
-  </div>
-  <div class="sec">即時報價</div>
+  
   <div id="mktList"><div class="loading-row"><div class="spin"></div><br>載入中...</div></div>
 </div>
 
@@ -838,9 +841,10 @@ const C = {
   LIFF_ID:     '2009624678-jXtdZr3P',
   GAS_URL:     'https://script.google.com/macros/s/AKfycbwMmwtiqanCJZB7-S_v73DhYyEQyV5e4HQof7nL1WPcTeSQ3SzlDB0Fojbf_QMqb2tY/exec',
   ADMIN_ID:    'U17769ba957e37cc8e63105a37b7388c5',
-  VERSION:     'v1.4',
+  VERSION:     'v1.5',
 };
 const UPDATE_LOGS = [
+  { ver: 'v1.5', date: '2026-03-28', content: '1. 完全修復初始化卡死問題（修正語法錯誤）\n2. 修正 K 線圖切換按鈕打錯字問題\n3. 優化圖表切換邏輯與提示資訊' },
   { ver: 'v1.4', date: '2026-03-28', content: '1. 修復初始化卡死問題\n2. K線切換功能優化' },
   { ver: 'v1.3', date: '2026-03-28', content: '1. 修復自選股新增/刪除/編輯邏輯\n2. 大盤當沖統計自動抓取前一交易日資料\n3. 新增右上角精準時鐘與 12/24 小時制切換\n4. 管理員後台新增更新紀錄選單' },
   { ver: 'v1.2', date: '2026-03-27', content: '1. K線圖修復與 MACD 指標新增\n2. 市場分類自定義功能\n3. 管理員永久超級權限\n4. 券商分點銀行資訊加強' },
@@ -1185,6 +1189,9 @@ async function loadWatchlist() {
 
 function renderWatchlist(prices) {
   const c = document.getElementById('watchContainer');
+  if (!S.watchlist.length) {
+    c.innerHTML = '<div class="no-data">尚無自選股，點擊＋新增</div>'; return;
+  }
   c.innerHTML = S.watchlist.map(code=>{
     const p = prices.find(x=>x.code===code)||{code,name:S.nameCache[code]||code,price:0,change:0,pct:0,ok:false};
     const up = p.change>=0;
@@ -1250,7 +1257,8 @@ async function deleteStock(code) {
   if (!await ui.confirm(`確定移除「${name}」(${code}) 嗎？`)) return;
   S.watchlist = S.watchlist.filter(c=>c!==code);
   saveWatch();
-  loadWatchlist();
+  // 立即重繪，提升反應速度
+  renderWatchlist(Object.values(S.priceCache));
   toast(`✅ 已移除 ${name}`);
   if (S.isLoggedIn) gas('saveWatchlist',{lineId:S.user.lineId,codes:S.watchlist});
 }
@@ -1304,7 +1312,8 @@ async function loadKline() {
   const code = S.currentStock?.code;
   if (!code) return;
   
-  const r = await gas('getHistory', {code:code, timeframe:S.klineTimeframe});
+  // 增加資料量到 200 筆，以利分析
+  const r = await gas('getHistory', {code:code, timeframe:S.klineTimeframe, limit: 200});
   if (!r?.ok) {
     drawKline(genKlineData(S.priceCache[code]||{}));
     return;
@@ -1498,25 +1507,40 @@ function klineOpts(data, label) {
   return {
     responsive:true, maintainAspectRatio:false,
     animation:{duration:400,easing:'easeOutQuart'},
-    plugins:{legend:{display:false},tooltip:{
-      backgroundColor:'rgba(10,15,23,.95)',
-      titleColor:'#e8edf5',bodyColor:'#8896a8',
-      borderColor:'rgba(255,34,51,.3)',borderWidth:1,
-      filter: item => item.dataset.label === 'K線',
-      callbacks:{
-        title:items=>'⏰ '+items[0].label,
-        label:item=>{
-          const d = data[item.dataIndex];
-          return [
-            `開盤: ${d.open.toFixed(2)}`,
-            `收盤: ${d.close.toFixed(2)}`,
-            `最高: ${d.high.toFixed(2)}`,
-            `最低: ${d.low.toFixed(2)}`,
-            `成交: ${d.vol}`
-          ];
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        backgroundColor:'rgba(10,15,23,.95)',
+        titleColor:'#e8edf5',bodyColor:'#8896a8',
+        borderColor:'rgba(255,34,51,.3)',borderWidth:1,
+        filter: item => ['K線','收盤','MACD','量'].includes(item.dataset.label),
+        callbacks:{
+          title:items=>'⏰ '+items[0].label,
+          label:item=>{
+            const d = data[item.dataIndex];
+            if (!d) return '';
+            return [
+              `開盤: ${d.open.toFixed(2)}`,
+              `收盤: ${d.close.toFixed(2)}`,
+              `最高: ${d.high.toFixed(2)}`,
+              `最低: ${d.low.toFixed(2)}`,
+              `成交: ${d.vol}`
+            ];
+          }
+        }
+      },
+      zoom: {
+        zoom: {
+          wheel: { enabled: true },
+          pinch: { enabled: true },
+          mode: 'x',
+        },
+        pan: {
+          enabled: true,
+          mode: 'x',
         }
       }
-    }},
+    },
     scales:{
       x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3a4a5c',font:{size:9},maxRotation:0,
         callback:(v,i)=>i%Math.ceil(data.length/6)===0?data[i]?.t:''}},
@@ -1549,10 +1573,9 @@ function genKlineData(p) {
 }
 
 function setKlineType(el, type) {
-  document.querySelectorAll('.kline-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.kline-tabs .kline-tab').forEach(t=>t.classList.remove('on'));
   el.classList.add('on'); S.klineType=type;
-  const p=S.priceCache[S.currentStock?.code]||{};
-  drawKline(S.currentStock?.code,S.currentStock?.name,p);
+  loadKline();
 }
 
 // ═══════════════════════════════════
@@ -1762,14 +1785,27 @@ function renderMktList(prices) {
   if(q) list=list.filter(p=>p.code?.includes(q)||p.name?.includes(q));
   document.getElementById('mktList').innerHTML=list.map(p=>{
     const up=p.change>=0;
-    return `<div class="sli" onclick="openCore('${p.code}','${p.name || S.nameCache[p.code] || p.code}',${p.price})">
-      <div><div class="sli-n">${p.name || S.nameCache[p.code] || p.code}</div><div class="sli-c">${p.code}</div></div>
-      <div>
+    const name = p.name || S.nameCache[p.code] || p.code;
+    return `<div class="sli" onclick="openCore('${p.code}','${name}',${p.price})">
+      <div style="flex:1">
+        <div class="sli-n">${name}</div>
+        <div class="sli-c">${p.code}</div>
+      </div>
+      <div style="text-align:right;margin-right:12px">
         <div class="sli-p ${up?'up':'dn'}">${p.price?.toFixed(2)||'--'}</div>
         <div class="sli-ch ${up?'up':'dn'}">${up?'▲':'▼'} ${Math.abs(p.pct||0).toFixed(2)}%</div>
       </div>
+      <div class="sc-act" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--rb);border-radius:50%;border:1px solid var(--bdrr);color:var(--red);font-size:14px" onclick="event.stopPropagation();addFromMarket('${p.code}','${name}')">＋</div>
     </div>`;
   }).join('')||'<div class="no-data">查無結果</div>';
+}
+
+async function addFromMarket(code, name) {
+  if (S.watchlist.includes(code)) return toast('⚠️ 已在自選清單中');
+  S.watchlist.push(code);
+  saveWatch();
+  toast(`✅ 已加入自選：${name}`);
+  if (S.isLoggedIn) gas('saveWatchlist',{lineId:S.user.lineId,codes:S.watchlist});
 }
 
 function setCat(el, cat) {
@@ -1858,10 +1894,19 @@ function selNfType(t) {
 }
 
 function selNfCh(c) {
+  const elLine = document.getElementById('nfLine');
+  const elBoth = document.getElementById('nfBoth');
+  const elTg = document.getElementById('nfTg');
+  
+  if ((c==='line' && elLine.classList.contains('disabled')) || 
+      (c==='both' && elBoth.classList.contains('disabled'))) {
+    return toast('⚠️ 您的方案不支援此通知管道');
+  }
+
   S.notifyChannel=c;
-  document.getElementById('nfTg').className='frbtn'+(c==='telegram'?' sel-tg':'');
-  document.getElementById('nfLine').className='frbtn'+(document.getElementById('nfLine').classList.contains('disabled')?'frbtn disabled':(c==='line'?'frbtn sel-line':'frbtn'));
-  document.getElementById('nfBoth').className='frbtn'+(document.getElementById('nfBoth').classList.contains('disabled')?'frbtn disabled':(c==='both'?'frbtn sel-both':'frbtn'));
+  elTg.className='frbtn'+(c==='telegram'?' sel-tg':'');
+  elLine.className='frbtn'+(elLine.classList.contains('disabled')?' disabled':(c==='line'?' sel-line':''));
+  elBoth.className='frbtn'+(elBoth.classList.contains('disabled')?' disabled':(c==='both'?' sel-both':''));
 }
 
 async function addNotify() {
