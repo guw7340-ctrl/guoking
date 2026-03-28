@@ -376,6 +376,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
     <div id="ldMsg" style="font-size:11px;color:var(--t3)">初始化中...</div>
     <div id="ldPct" style="font-size:11px;color:var(--t3);font-family:var(--mono)">0%</div>
   </div>
+  <button id="ldForce" style="display:none;margin-top:20px;font-size:11px;padding:6px 12px;background:var(--bg3);border:1px solid var(--bdr);border-radius:4px;color:var(--t2)" onclick="hideLoading()">強制進入系統</button>
 </div>
 
 <div id="toast"></div>
@@ -595,6 +596,20 @@ canvas#klineChart{width:100%!important;height:100%!important}
     <!-- 當沖專屬功能 -->
     <div class="sec">⚔️ 當沖專屬功能</div>
     <div class="feat-grid" id="featGrid"></div>
+
+    <!-- 每日簽到 & 分享 -->
+    <div class="feat-grid" style="margin-bottom:12px">
+      <div class="feat-card" onclick="doCheckIn()">
+        <div class="feat-ico">📅</div>
+        <div class="feat-nm">每日簽到</div>
+        <div class="feat-desc">領取效期獎勵</div>
+      </div>
+      <div class="feat-card" onclick="doShare()">
+        <div class="feat-ico">📢</div>
+        <div class="feat-nm">分享好友</div>
+        <div class="feat-desc">推廣紅龍系統</div>
+      </div>
+    </div>
 
     <!-- 方案 -->
     <div class="sec">🔥 升級方案</div>
@@ -1022,29 +1037,32 @@ window.addEventListener('load', async () => {
   tasks.push(loadIndex());
   tasks.push(loadMarket());
 
-  await Promise.all(tasks);
+  // 安全機制：5秒後顯示強制進入按鈕，10秒後自動隱藏 loading
+  setTimeout(() => {
+    const btn = document.getElementById('ldForce');
+    if (btn) btn.style.display = 'block';
+  }, 5000);
+  setTimeout(hideLoading, 10000);
+
+  try {
+    await Promise.all(tasks);
+  } catch(e) {
+    console.error('Init tasks failed:', e);
+  }
 
   ldMsg('完成', 100);
-  // 隱藏 loading
-  setTimeout(() => {
-    const ld = document.getElementById('loading');
-    if (ld) {
-      ld.style.opacity = '0';
-      setTimeout(() => ld.style.display='none', 400);
-    }
+  hideLoading();
+});
+
+function hideLoading() {
+  const ld = document.getElementById('loading');
+  if (ld && ld.style.display !== 'none') {
+    ld.style.opacity = '0';
+    setTimeout(() => ld.style.display='none', 400);
     renderNotifyList();
     renderFeatGrid();
-  }, 300);
-
-  // 其餘延遲載入
-  setTimeout(() => {
-    if (S.pref.scan)   loadScanByMode('主力異動');
-    if (S.pref.big)    loadBigTab('台灣指數');
-  }, 500);
-
-  // 自動刷新（開市中每30秒）
-  setInterval(autoRefresh, 30000);
-});
+  }
+}
 
 function ldMsg(m, pct) {
   const el = document.getElementById('ldMsg');
@@ -1359,120 +1377,59 @@ function drawKline(data) {
       options:klineOpts(data,'成交量'),
     });
   }
-}.low)/(p.high-p.low||1))*100||50)):'-';
-  document.getElementById('kDtSellPow').textContent=p.vol?Math.min(99,Math.round(((p.high-p.close)/(p.high-p.low||1))*100||50)):'-';
-
-  // 重置 tabs
-  document.querySelectorAll('#coreTabs .tab').forEach(t=>t.classList.remove('on'));
-  document.querySelector('#coreTabs .tab').classList.add('on');
-
-  document.getElementById('ovCore').classList.add('on');
-  drawKline(code, name, p);
-  loadCoreData('主力進出');
-}
-
-function drawKline(code, name, priceObj) {
-  if (S.klineChart) { S.klineChart.destroy(); S.klineChart=null; }
-  const ctx = document.getElementById('klineChart').getContext('2d');
-  // 生成模擬當日分鐘K線資料（真實環境替換為API）
-  const data = genKlineData(priceObj);
-  const isUp = priceObj.change>=0;
-
-  if (S.klineType==='candle') {
-    // 蠟燭圖用 bar dataset 模擬
-    const opens=[],closes=[],highs=[],lows=[],colors=[];
-    data.forEach(d=>{
-      const u=d.close>=d.open;
-      opens.push(d.open);closes.push(d.close);highs.push(d.high);lows.push(d.low);
-      colors.push(u?'rgba(255,34,51,.85)':'rgba(0,230,118,.85)');
-    });
-    S.klineChart = new Chart(ctx,{
-      type:'bar',
-      data:{
-        labels:data.map(d=>d.t),
-        datasets:[
-          {
-            label:'Wick',
-            data:data.map(d=>[d.low,d.high]),
-            backgroundColor:colors,
-            borderColor:colors,
-            borderWidth:1,
-            barThickness: 1,
-            order: 2
-          },
-          {
-            label:'K線',
-            data:data.map(d=>([Math.min(d.open,d.close),Math.max(d.open,d.close)])),
-            backgroundColor:colors,
-            borderColor:colors,
-            borderWidth:1,
-            barPercentage:.6,
-            order: 1
-          }
-        ]
-      },
-      options: klineOpts(data,'K線'),
-    });
-  } else if (S.klineType==='line') {
-    S.klineChart = new Chart(ctx,{
-      type:'line',
-      data:{labels:data.map(d=>d.t),
-        datasets:[{label:'收盤',data:data.map(d=>d.close),
-          borderColor:isUp?'var(--red)':'var(--grn)',borderWidth:2,
-          pointRadius:0,fill:true,
-          backgroundColor:isUp?'rgba(255,34,51,.07)':'rgba(0,230,118,.07)',
-          tension:.3}]},
-      options:klineOpts(data,'分鐘折線'),
-    });
-  } else if (S.klineType==='macd') {
-    // MACD 指標
-    const macdData = calcMACD(data);
-    S.klineChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: data.map(d => d.t),
-        datasets: [
-          {
-            label: 'MACD',
-            data: macdData.macd,
-            borderColor: '#00b4ff',
-            borderWidth: 1.5,
-            type: 'line',
-            pointRadius: 0,
-            fill: false,
-            order: 2
-          },
-          {
-            label: 'Signal',
-            data: macdData.signal,
-            borderColor: '#ffd700',
-            borderWidth: 1.5,
-            type: 'line',
-            pointRadius: 0,
-            fill: false,
-            order: 3
-          },
-          {
-            label: 'Hist',
-            data: macdData.hist,
-            backgroundColor: macdData.hist.map(v => v >= 0 ? 'rgba(255,34,51,.7)' : 'rgba(0,230,118,.7)'),
-            order: 1
-          }
-        ]
-      },
-      options: klineOpts(data, 'MACD'),
-    });
-  } else {
-    // 量能圖
-    S.klineChart = new Chart(ctx,{
-      type:'bar',
-      data:{labels:data.map(d=>d.t),
-        datasets:[{label:'量',data:data.map(d=>d.vol),
-          backgroundColor:data.map(d=>d.close>=d.open?'rgba(255,34,51,.7)':'rgba(0,230,118,.7)')}]},
-      options:klineOpts(data,'成交量'),
-    });
+async function doCheckIn() {
+  if (!S.isLoggedIn) return ui.alert('請先登入 LINE');
+  ldMsg('簽到中...', 50);
+  try {
+    const r = await gas('checkIn', { lineId: S.user.lineId });
+    if (r?.ok) {
+      ui.alert(r.msg, '簽到成功', '🎁');
+      if (r.newExp) {
+        S.user.expiry = r.newExp;
+        document.getElementById('memPlan').textContent = (S.user.isAdmin?'超級權限':'專業版') + ' (到期：'+r.newExp+')';
+      }
+    } else {
+      ui.alert(r?.error || '簽到失敗', '提示', '⚠️');
+    }
+  } catch(e) {
+    ui.alert('連線失敗，請稍後再試');
+  } finally {
+    ldMsg('完成', 100);
+    setTimeout(hideLoading, 500);
   }
 }
+
+async function doShare() {
+  if (!liff.isApiAvailable('shareTargetPicker')) {
+    ui.alert('您的 LINE 版本不支援分享功能');
+    return;
+  }
+  try {
+    const res = await liff.shareTargetPicker([
+      {
+        type: "flex",
+        altText: "當沖圍中紅龍 - 您的當沖好幫手",
+        contents: {
+          type: "bubble",
+          body: {
+            type: "box",
+            layout: "vertical",
+            contents: [
+              { type: "text", text: "當沖圍中紅龍", weight: "bold", size: "xl", color: "#ff2233" },
+              { type: "text", text: "專業當沖監控系統", size: "sm", color: "#888888", margin: "md" },
+              { type: "text", text: "✓ 盤中即時掃描\n✓ 籌碼大數據分析\n✓ 專業K線指標", size: "xs", color: "#555555", wrap: true, margin: "lg" },
+              { type: "button", action: { type: "uri", label: "立即體驗", uri: window.location.href }, style: "primary", color: "#ff2233", margin: "xl" }
+            ]
+          }
+        }
+      }
+    ]);
+    if (res) toast('✅ 分享成功');
+  } catch(e) {
+    console.error('Share failed:', e);
+  }
+}
+
 
 function calcEMA(data, period) {
   const k = 2 / (period + 1);
