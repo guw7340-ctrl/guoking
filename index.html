@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<title>當沖圍中紅龍 v1.2</title>
+<title>當沖圍中紅龍 v1.3</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -369,7 +369,7 @@ canvas#klineChart{width:100%!important;height:100%!important}
 <div id="loading">
   <div class="ld-logo">龍</div>
   <div style="font-size:18px;font-weight:900">當沖圍中紅龍</div>
-  <div class="ld-sub">v1.2 · DAYTRADING SYSTEM</div>
+  <div class="ld-sub">v1.3 · DAYTRADING SYSTEM</div>
   <div style="background:var(--rg);border:1px solid var(--bdrr);border-radius:6px;padding:4px 12px;font-size:10px;color:var(--red);font-weight:700">🎁 免費試用中</div>
   <div class="ld-bar"><div class="ld-fill"></div></div>
   <div style="display:flex;justify-content:space-between;width:200px;margin-top:-5px">
@@ -385,9 +385,10 @@ canvas#klineChart{width:100%!important;height:100%!important}
 <div id="hdr">
   <div class="logo">
     <div class="logo-box">龍</div>
-    <div class="logo-txt">當沖圍中紅龍<span class="ver-tag">v1.2</span></div>
+    <div class="logo-txt">當沖圍中紅龍<span class="ver-tag">v1.3</span></div>
   </div>
   <div class="hdr-r">
+    <div id="clock" style="font-family:var(--mono);font-size:11px;color:var(--t2);margin-right:8px;font-weight:700"></div>
     <div class="trial-badge" id="trialBadge">🎁 試用中</div>
     <div id="mktBadge" class="mkt-badge mkt-close">休市</div>
     <div class="av-wrap" id="avWrap" onclick="switchPg('member',document.querySelector('.nav-btn:last-child'))" style="display:none">
@@ -584,6 +585,11 @@ canvas#klineChart{width:100%!important;height:100%!important}
         <input type="range" id="fontSizeSlider" min="0.8" max="1.3" step="0.05" value="1" style="flex:1;accent-color:var(--red)" oninput="updateFontSize(this.value)">
         <span style="font-size:12px;color:var(--t3)">大</span>
       </div>
+      <div class="flbl" style="margin-top:12px;margin-bottom:6px">🕒 時間顯示格式</div>
+      <div class="fradio">
+        <div class="frbtn" id="tf24" onclick="setTimeFormat('24h')">24 小時制</div>
+        <div class="frbtn" id="tf12" onclick="setTimeFormat('12h')">12 小時制</div>
+      </div>
     </div>
 
     <!-- 當沖專屬功能 -->
@@ -617,12 +623,14 @@ canvas#klineChart{width:100%!important;height:100%!important}
     <div class="adm-box">
       <div class="adm-title">👑 管理員後台</div>
       <div class="sec" style="margin-top:0">會員列表</div>
-      <div style="overflow-x:auto">
+      <div style="overflow-x:auto;margin-bottom:12px">
         <table class="tbl" id="memTbl">
           <thead><tr><th>名稱</th><th>手機</th><th>方案</th><th>到期</th><th>狀態</th><th>操作</th></tr></thead>
           <tbody id="memTblBody"><tr><td colspan="6" style="text-align:center;padding:10px"><div class="spin"></div></td></tr></tbody>
         </table>
       </div>
+      <div class="sec">系統更新紀錄</div>
+      <div id="adminLogs" style="font-size:11px;color:var(--t2);background:var(--bg3);padding:10px;border-radius:8px;max-height:200px;overflow-y:auto"></div>
     </div>
   </div>
 </div>
@@ -815,8 +823,13 @@ const C = {
   LIFF_ID:     '2009624678-jXtdZr3P',
   GAS_URL:     'https://script.google.com/macros/s/AKfycbwMmwtiqanCJZB7-S_v73DhYyEQyV5e4HQof7nL1WPcTeSQ3SzlDB0Fojbf_QMqb2tY/exec',
   ADMIN_ID:    'U17769ba957e37cc8e63105a37b7388c5',
-  VERSION:     'v1.2',
+  VERSION:     'v1.3',
 };
+const UPDATE_LOGS = [
+  { ver: 'v1.3', date: '2026-03-28', content: '1. 修復自選股新增/刪除/編輯邏輯\n2. 大盤當沖統計自動抓取前一交易日資料\n3. 新增右上角精準時鐘與 12/24 小時制切換\n4. 管理員後台新增更新紀錄選單' },
+  { ver: 'v1.2', date: '2026-03-27', content: '1. K線圖修復與 MACD 指標新增\n2. 市場分類自定義功能\n3. 管理員永久超級權限\n4. 券商分點銀行資訊加強' },
+  { ver: 'v1.1', date: '2026-03-25', content: '1. 介面美化與效能優化\n2. 週末抓取週五收盤價功能\n3. 修正 TAIEX 指數載入問題' }
+];
 
 // ═══════════════════════════════════
 //  STATE
@@ -835,6 +848,7 @@ const S = {
   pref:{},  // {watch:true, market:false, scan:false, big:false}
   alertResolver: null,
   marketCategories: null, // { name: [codes] }
+  timeFormat: localStorage.getItem('rdTimeFormat') || '24h',
 };
 
 // ═══════════════════════════════════
@@ -883,6 +897,44 @@ const ui = {
     });
   }
 };
+
+function updateClock() {
+  const el = document.getElementById('clock');
+  if (!el) return;
+  const now = new Date();
+  const h = now.getHours();
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  if (S.timeFormat === '12h') {
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    el.textContent = `${h12}:${m}:${s} ${ampm}`;
+  } else {
+    el.textContent = `${String(h).padStart(2, '0')}:${m}:${s}`;
+  }
+}
+function setTimeFormat(fmt) {
+  S.timeFormat = fmt;
+  localStorage.setItem('rdTimeFormat', fmt);
+  const t24 = document.getElementById('tf24');
+  const t12 = document.getElementById('tf12');
+  if(t24) t24.className = 'frbtn' + (fmt==='24h'?' sel-line':'');
+  if(t12) t12.className = 'frbtn' + (fmt==='12h'?' sel-line':'');
+  updateClock();
+}
+function renderAdminLogs() {
+  const el = document.getElementById('adminLogs');
+  if (!el) return;
+  el.innerHTML = UPDATE_LOGS.map(log => `
+    <div style="margin-bottom:10px;border-bottom:1px solid var(--bdr);padding-bottom:5px">
+      <div style="display:flex;justify-content:space-between;font-weight:700">
+        <span>${log.ver}</span>
+        <span style="color:var(--t3)">${log.date}</span>
+      </div>
+      <div style="white-space:pre-wrap;margin-top:4px">${log.content}</div>
+    </div>
+  `).join('');
+}
 
 function onAlertClose(res) {
   closeOvId('ovAlert');
@@ -955,6 +1007,9 @@ window.addEventListener('load', async () => {
 
   checkMarket();
   updateNotifyChannelUI();
+  setTimeFormat(S.timeFormat);
+  setInterval(updateClock, 1000);
+  if (S.isAdmin) renderAdminLogs();
 
   ldMsg('載入核心數據...', 80);
   const tasks = [];
@@ -1077,9 +1132,10 @@ function renderWatchlist(prices) {
     const p = prices.find(x=>x.code===code)||{code,name:S.nameCache[code]||code,price:0,change:0,pct:0,ok:false};
     const up = p.change>=0;
     const cls = up?'up':'dn'; const arr=up?'▲':'▼';
-    return `<div class="sc ${cls}" onclick="openCore('${p.code}','${p.name||code}',${p.price})">
+    const escName = (p.name||S.nameCache[code]||code).replace(/'/g, "\\'");
+    return `<div class="sc ${cls}" onclick="openCore('${p.code}','${escName}',${p.price||0})">
       <div class="sc-actions">
-        <div class="sc-act" onclick="event.stopPropagation();editStock('${p.code}','${p.name||code}')">✏️</div>
+        <div class="sc-act" onclick="event.stopPropagation();editStock('${p.code}','${escName}')">✏️</div>
         <div class="sc-act del" onclick="event.stopPropagation();deleteStock('${p.code}')">✕</div>
       </div>
       <div class="sc-top">
@@ -1165,7 +1221,7 @@ function saveWatch() { localStorage.setItem('rdWatch',JSON.stringify(S.watchlist
 // ═══════════════════════════════════
 //  K 線圖（Chart.js 當沖版）
 // ═══════════════════════════════════
-function openCore(code, name, price) {
+async function openCore(code, name, price) {
   S.currentStock = {code,name,price};
   document.getElementById('klineName').textContent=name;
   document.getElementById('klineCode').textContent=code;
@@ -1176,6 +1232,134 @@ function openCore(code, name, price) {
   document.getElementById('klineChg').className='sc-chg '+(up?'up':'dn');
   document.getElementById('kDtVol').textContent=fmtVol(p.vol);
   document.getElementById('kDtBuyPow').textContent=p.vol?Math.min(99,Math.round(((p.close-p.low)/(p.high-p.low||1))*100||50)):'-';
+  document.getElementById('kDtSellPow').textContent=p.vol?Math.min(99,Math.round(((p.high-p.close)/(p.high-p.low||1))*100||50)):'-';
+
+  // 重置 tabs
+  document.querySelectorAll('#coreTabs .tab').forEach(t=>t.classList.remove('on'));
+  document.querySelector('#coreTabs .tab').classList.add('on');
+
+  document.getElementById('ovCore').classList.add('on');
+  loadKline();
+  loadCoreData('主力進出');
+}
+
+async function loadKline() {
+  const code = S.currentStock?.code;
+  if (!code) return;
+  
+  const r = await gas('getHistory', {code:code, timeframe:S.klineTimeframe});
+  if (!r?.ok) {
+    drawKline(genKlineData(S.priceCache[code]||{}));
+    return;
+  }
+  drawKline(r.data);
+}
+
+function setKlineTimeframe(el, tf) {
+  S.klineTimeframe = tf;
+  document.querySelectorAll('#klineTimeframes .btn-xs').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  loadKline();
+}
+
+function drawKline(data) {
+  if (S.klineChart) { S.klineChart.destroy(); S.klineChart=null; }
+  const ctx = document.getElementById('klineChart').getContext('2d');
+  if (!data || !data.length) return;
+
+  const isUp = data[data.length-1].close >= data[0].close;
+  
+  if (S.klineType==='candle') {
+    const colors = [];
+    data.forEach(d=>{
+      const u=d.close>=d.open;
+      colors.push(u?'rgba(255,34,51,.85)':'rgba(0,230,118,.85)');
+    });
+    S.klineChart = new Chart(ctx,{
+      type:'bar',
+      data:{
+        labels:data.map(d=>d.t),
+        datasets:[
+          {
+            label:'Wick',
+            data:data.map(d=>[d.low,d.high]),
+            backgroundColor:colors,
+            borderColor:colors,
+            borderWidth:1.5,
+            barThickness: 2,
+            order: 2
+          },
+          {
+            label:'K線',
+            data:data.map(d=>([Math.min(d.open,d.close),Math.max(d.open,d.close)])),
+            backgroundColor:colors,
+            borderColor:colors,
+            borderWidth:1,
+            barPercentage:.8,
+            order: 1
+          }
+        ]
+      },
+      options: klineOpts(data,'K線'),
+    });
+  } else if (S.klineType==='line') {
+    S.klineChart = new Chart(ctx,{
+      type:'line',
+      data:{labels:data.map(d=>d.t),
+        datasets:[{label:'收盤',data:data.map(d=>d.close),
+          borderColor:isUp?'var(--red)':'var(--grn)',borderWidth:2,
+          pointRadius:0,fill:true,
+          backgroundColor:isUp?'rgba(255,34,51,.07)':'rgba(0,230,118,.07)',
+          tension:.3}]},
+      options:klineOpts(data,'分鐘折線'),
+    });
+  } else if (S.klineType==='macd') {
+    const macdData = calcMACD(data);
+    S.klineChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(d => d.t),
+        datasets: [
+          {
+            label: 'MACD',
+            data: macdData.macd,
+            borderColor: '#00b4ff',
+            borderWidth: 1.5,
+            type: 'line',
+            pointRadius: 0,
+            fill: false,
+            order: 2
+          },
+          {
+            label: 'Signal',
+            data: macdData.signal,
+            borderColor: '#ffd700',
+            borderWidth: 1.5,
+            type: 'line',
+            pointRadius: 0,
+            fill: false,
+            order: 3
+          },
+          {
+            label: 'Hist',
+            data: macdData.hist,
+            backgroundColor: macdData.hist.map(v => v >= 0 ? 'rgba(255,34,51,.7)' : 'rgba(0,230,118,.7)'),
+            order: 1
+          }
+        ]
+      },
+      options: klineOpts(data, 'MACD'),
+    });
+  } else {
+    S.klineChart = new Chart(ctx,{
+      type:'bar',
+      data:{labels:data.map(d=>d.t),
+        datasets:[{label:'量',data:data.map(d=>d.vol),
+          backgroundColor:data.map(d=>d.close>=d.open?'rgba(255,34,51,.7)':'rgba(0,230,118,.7)')}]},
+      options:klineOpts(data,'成交量'),
+    });
+  }
+}.low)/(p.high-p.low||1))*100||50)):'-';
   document.getElementById('kDtSellPow').textContent=p.vol?Math.min(99,Math.round(((p.high-p.close)/(p.high-p.low||1))*100||50)):'-';
 
   // 重置 tabs
@@ -1781,10 +1965,13 @@ async function loadBroker() {
   const code=document.getElementById('brokerCode').value.trim().toUpperCase();
   if(!code)return;
   document.getElementById('brokerResult').innerHTML='<div class="spin"></div>';
-  const r=await gas('getTopBuySell',{code});
-  if(r?.ok&&r?.data?.data?.length) {
-    document.getElementById('brokerResult').innerHTML=r.data.data.slice(-5).map(row=>
-      `<div class="drow"><span class="dl">${row[0]||'--'}</span><span class="dv neu" style="font-size:10px">量${row[1]||'--'}</span></div>`
+  const r=await gas('getBrokerData',{code});
+  if(r?.ok&&r?.data?.length) {
+    document.getElementById('brokerResult').innerHTML=r.data.map(b=>
+      `<div class="drow">
+        <span class="dl">${b.name} <span style="font-size:9px;color:var(--t3)">(${b.branch})</span></span>
+        <span class="dv ${b.net>=0?'up':'dn'}">${b.net>=0?'+':''}${b.net}</span>
+      </div>`
     ).join('');
   } else document.getElementById('brokerResult').innerHTML='<div style="font-size:11px;color:var(--t3)">無資料（盤後更新）</div>';
 }
@@ -1837,12 +2024,27 @@ function renderBigIndustry(r,c){
   }).join('')+'</div>';
 }
 
-function renderBigDayTrade(c){
-  c.innerHTML=`<div class="card">
-    <div class="drow"><span class="dl">當沖交易統計</span><span class="dv up">盤後更新</span></div>
-    <div class="drow"><span class="dl">當沖比例</span><span class="dv">TWSE 盤後公布</span></div>
-    <div style="margin-top:8px;font-size:11px;color:var(--t3)">當沖資料約14:30後於 TWSE 官網公布，本系統自動同步。</div>
-  </div>`;
+async function renderBigDayTrade(c){
+  c.innerHTML='<div class="loading-row"><div class="spin"></div><br>載入中...</div>';
+  const r = await gas('getMarketDayTrade');
+  if (r?.ok && r.data?.data?.length) {
+    const rows = r.data.data;
+    // TWTB4U structure: [證券代號, 證券名稱, 成交股數, 成交金額, 成交筆數, ...]
+    // Market summary is usually not in TWTB4U, but we can show the top stocks or a summary if we have it.
+    // Let's assume we want to show the date and some key info.
+    c.innerHTML=`<div class="card">
+      <div class="drow"><span class="dl">資料日期</span><span class="dv">${r.date}</span></div>
+      <div class="drow"><span class="dl">當沖交易統計</span><span class="dv up">已更新</span></div>
+      <div style="margin-top:8px;font-size:11px;color:var(--t2)">當前顯示為 ${r.date} 之盤後資料。</div>
+      <div style="margin-top:4px;font-size:10px;color:var(--t3)">註：當沖比例與詳細統計請參考 TWSE 官網。</div>
+    </div>`;
+  } else {
+    c.innerHTML=`<div class="card">
+      <div class="drow"><span class="dl">當沖交易統計</span><span class="dv up">盤後更新</span></div>
+      <div class="drow"><span class="dl">當沖比例</span><span class="dv">TWSE 盤後公布</span></div>
+      <div style="margin-top:8px;font-size:11px;color:var(--t3)">當沖資料約14:30後於 TWSE 官網公布，本系統自動同步。</div>
+    </div>`;
+  }
 }
 
 // ═══════════════════════════════════
