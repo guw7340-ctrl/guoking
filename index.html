@@ -19,9 +19,10 @@
   --bdr:rgba(255,255,255,.06);--bdrr:rgba(255,34,51,.35);--bdrg:rgba(0,230,118,.35);
   --mono:'Share Tech Mono',monospace;--font:'Noto Sans TC',sans-serif;
   --r:12px;--rs:8px;--safe:env(safe-area-inset-bottom,0px);
+  --fz: 14px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--t1);font-family:var(--font)}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--t1);font-family:var(--font);font-size:var(--fz)}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:
     radial-gradient(ellipse at 15% 50%,rgba(255,34,51,.05) 0,transparent 55%),
@@ -399,7 +400,10 @@ canvas#klineChart{width:100%!important;height:100%!important}
 <div class="pg on" id="pg-watch">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
     <div class="sec" style="margin:0">⭐ 我的自選股</div>
-    <button class="btn-sm" onclick="openAddStock()">＋ 新增</button>
+    <div style="display:flex;gap:6px">
+      <button class="btn-sm" style="background:var(--blg);border-color:var(--blue);color:var(--blue)" onclick="refreshWatchlist()">🔄 刷新</button>
+      <button class="btn-sm" onclick="openAddStock()">＋ 新增</button>
+    </div>
   </div>
   <div id="watchContainer"><div class="loading-row"><div class="spin"></div><br>載入中...</div></div>
 </div>
@@ -570,6 +574,16 @@ canvas#klineChart{width:100%!important;height:100%!important}
         <button class="btn-sm" onclick="saveTg()">儲存</button>
       </div>
       <div style="font-size:9px;color:var(--t3);margin-top:4px">在 Telegram 搜尋 @userinfobot 取得 User ID</div>
+    </div>
+
+    <!-- 介面設定 -->
+    <div class="card" style="margin-bottom:7px">
+      <div class="flbl" style="margin-bottom:6px">📏 介面字體大小</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:5px 0">
+        <span style="font-size:12px;color:var(--t3)">小</span>
+        <input type="range" id="fontSizeSlider" min="0.8" max="1.3" step="0.05" value="1" style="flex:1;accent-color:var(--red)" oninput="updateFontSize(this.value)">
+        <span style="font-size:12px;color:var(--t3)">大</span>
+      </div>
     </div>
 
     <!-- 當沖專屬功能 -->
@@ -753,6 +767,19 @@ canvas#klineChart{width:100%!important;height:100%!important}
   </div>
 </div>
 
+<!-- 美化 Alert / Confirm -->
+<div class="ov" id="ovAlert" style="z-index:2000;align-items:center">
+  <div class="mdl" style="width:85%;max-width:320px;border-radius:16px;padding:24px;text-align:center;margin:auto;border:1px solid var(--bdr)">
+    <div id="alertIcon" style="font-size:44px;margin-bottom:12px">⚠️</div>
+    <div id="alertTitle" style="font-size:17px;font-weight:800;margin-bottom:8px">提示</div>
+    <div id="alertMsg" style="font-size:14px;color:var(--t2);margin-bottom:24px;line-height:1.6;word-break:break-all"></div>
+    <div style="display:flex;gap:10px">
+      <button id="alertCancel" class="btn-outline" style="display:none" onclick="onAlertClose(false)">取消</button>
+      <button id="alertConfirm" class="btn-red" onclick="onAlertClose(true)">確定</button>
+    </div>
+  </div>
+</div>
+
 <script>
 'use strict';
 // ═══════════════════════════════════
@@ -780,7 +807,84 @@ const S = {
   klineChart:null, klineType:'candle',
   adminTarget:null, adminPlan:null,
   pref:{},  // {watch:true, market:false, scan:false, big:false}
+  alertResolver: null,
 };
+
+// ═══════════════════════════════════
+//  UI UTILS
+// ═══════════════════════════════════
+const ui = {
+  alert: (msg, title='提示', icon='⚠️') => {
+    return new Promise(resolve => {
+      document.getElementById('alertTitle').innerText = title;
+      document.getElementById('alertMsg').innerText = msg;
+      document.getElementById('alertIcon').innerText = icon;
+      document.getElementById('alertCancel').style.display = 'none';
+      const btn = document.getElementById('alertConfirm');
+      btn.innerText = '確定';
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      
+      S.alertResolver = resolve;
+      openOvId('ovAlert');
+      
+      // 防誤觸：1秒後才可點擊
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }, 800);
+    });
+  },
+  confirm: (msg, title='確認', icon='❓') => {
+    return new Promise(resolve => {
+      document.getElementById('alertTitle').innerText = title;
+      document.getElementById('alertMsg').innerText = msg;
+      document.getElementById('alertIcon').innerText = icon;
+      document.getElementById('alertCancel').style.display = 'block';
+      const btn = document.getElementById('alertConfirm');
+      btn.innerText = '確認';
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      
+      S.alertResolver = resolve;
+      openOvId('ovAlert');
+      
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }, 1000);
+    });
+  }
+};
+
+function onAlertClose(res) {
+  closeOvId('ovAlert');
+  if (S.alertResolver) {
+    S.alertResolver(res);
+    S.alertResolver = null;
+  }
+}
+
+function updateFontSize(val) {
+  document.documentElement.style.setProperty('--fz', (14 * val) + 'px');
+  localStorage.setItem('rdFontSize', val);
+}
+
+async function refreshWatchlist() {
+  if (!S.isLoggedIn) return ui.alert('請先登入');
+  ldMsg('同步自選股...');
+  try {
+    const r = await gas('getWatchlist', { lineId: S.user.lineId });
+    if (r?.ok) {
+      S.watchlist = r.codes;
+      localStorage.setItem('rdWatch', JSON.stringify(S.watchlist));
+      renderWatchlist();
+      toast('自選股已同步');
+    }
+  } catch(e) {
+    toast('同步失敗');
+  }
+}
 
 // ═══════════════════════════════════
 //  INIT
@@ -793,6 +897,12 @@ window.addEventListener('load', async () => {
   S.watchlist = JSON.parse(localStorage.getItem('rdWatch') || '["2330","2454","0050","2317","2308"]');
   S.notifyList = JSON.parse(localStorage.getItem('rdNotify') || '[]');
   S.nameCache  = JSON.parse(localStorage.getItem('rdNames') || '{}');
+
+  const savedFz = localStorage.getItem('rdFontSize');
+  if (savedFz) {
+    updateFontSize(savedFz);
+    document.getElementById('fontSizeSlider').value = savedFz;
+  }
 
   // LIFF init
   ldMsg('連線 LINE LIFF...');
@@ -972,9 +1082,9 @@ function editStock(code, name) {
   document.getElementById('ovAdd').classList.add('on');
 }
 
-function deleteStock(code) {
+async function deleteStock(code) {
   const name = S.nameCache[code]||code;
-  if (!confirm(`確定移除「${name}」(${code}) 嗎？`)) return;
+  if (!await ui.confirm(`確定移除「${name}」(${code}) 嗎？`)) return;
   S.watchlist = S.watchlist.filter(c=>c!==code);
   saveWatch();
   loadWatchlist();
@@ -1047,10 +1157,24 @@ function drawKline(code, name, priceObj) {
       data:{
         labels:data.map(d=>d.t),
         datasets:[
-          {label:'K線',data:data.map(d=>([Math.min(d.open,d.close),Math.max(d.open,d.close)])),
-            backgroundColor:colors,borderColor:colors,borderWidth:1,barPercentage:.6},
-          {type:'line',label:'High/Low',data:data.map(d=>d.high),borderColor:'transparent',pointRadius:0,
-            segment:{borderColor:ctx=>'transparent'}},
+          {
+            label:'Wick',
+            data:data.map(d=>[d.low,d.high]),
+            backgroundColor:colors,
+            borderColor:colors,
+            borderWidth:1,
+            barThickness: 1,
+            order: 2
+          },
+          {
+            label:'K線',
+            data:data.map(d=>([Math.min(d.open,d.close),Math.max(d.open,d.close)])),
+            backgroundColor:colors,
+            borderColor:colors,
+            borderWidth:1,
+            barPercentage:.6,
+            order: 1
+          }
         ]
       },
       options: klineOpts(data,'K線'),
@@ -1086,9 +1210,19 @@ function klineOpts(data, label) {
       backgroundColor:'rgba(10,15,23,.95)',
       titleColor:'#e8edf5',bodyColor:'#8896a8',
       borderColor:'rgba(255,34,51,.3)',borderWidth:1,
+      filter: item => item.dataset.label === 'K線',
       callbacks:{
         title:items=>'⏰ '+items[0].label,
-        label:item=>`${item.dataset.label}: ${typeof item.raw==='number'?item.raw.toFixed(2):JSON.stringify(item.raw)}`,
+        label:item=>{
+          const d = data[item.dataIndex];
+          return [
+            `開盤: ${d.open.toFixed(2)}`,
+            `收盤: ${d.close.toFixed(2)}`,
+            `最高: ${d.high.toFixed(2)}`,
+            `最低: ${d.low.toFixed(2)}`,
+            `成交: ${d.vol}`
+          ];
+        }
       }
     }},
     scales:{
@@ -1303,7 +1437,7 @@ function updateNotifyChannelUI() {
   const isYearly=plan==='yearly';
   const isMonthly=plan==='monthly'||isYearly;
   // 月費：可用 Telegram；年費：可用 LINE+TG+雙送；免費試用：全部可用
-  const trial=S.freeTrial;
+  const trial=S.freeTrial || S.isAdmin;
   ['nfLine','nfBoth'].forEach(id=>{
     const el=document.getElementById(id);
     if (isYearly||trial) el.classList.remove('disabled');
@@ -1512,13 +1646,13 @@ const FEATS = [
 
 function renderFeatGrid() {
   const plan=S.user?.plan||'free';
-  const trial=S.freeTrial;
+  const trial=S.freeTrial || S.isAdmin;
   const order=['free','monthly','yearly'];
   const planIdx=order.indexOf(plan);
   const g=document.getElementById('featGrid');
   g.innerHTML=FEATS.map(f=>{
     const reqIdx=order.indexOf(f.plan);
-    const locked=!trial&&planIdx<reqIdx;
+    const locked=!trial && planIdx<reqIdx;
     return `<div class="feat-card" onclick="${locked?"showPay('月費',29)":""}">
       ${locked?'<div class="feat-lock-overlay">🔒</div>':''}
       <div class="feat-ico">${f.ico}</div>
