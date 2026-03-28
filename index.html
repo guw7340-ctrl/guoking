@@ -702,10 +702,10 @@ canvas#klineChart{width:100%!important;height:100%!important}
         <div class="kline-tab" onclick="setKlineType(this,'vol')">量能</div>
         <div class="kline-tab" onclick="setKlineType(this,'macd')">MACD</div>
       </div>
-      <div style="display:flex;gap:5px;margin-top:8px" id="klineTimeframes">
-        <button class="btn-xs on" onclick="setKlineTimeframe(this,'day')">日線</button>
-        <button class="btn-xs" onclick="setKlineTimeframe(this,'week')">週線</button>
-        <button class="btn-xs" onclick="setKlineTimeframe(this,'month')">月線</button>
+      <div style="display:flex;gap:5px;margin-top:8px;z-index:10;position:relative" id="klineTimeframes">
+        <div class="kline-tab on" onclick="setKlineTimeframe(this,'day')">日線</div>
+        <div class="kline-tab" onclick="setKlineTimeframe(this,'week')">週線</div>
+        <div class="kline-tab" onclick="setKlineTimeframe(this((,'month')">月線</div>
       </div>
       <div class="kline-canvas-wrap">
         <canvas id="klineChart"></canvas>
@@ -1052,6 +1052,15 @@ window.addEventListener('load', async () => {
 
   ldMsg('完成', 100);
   hideLoading();
+
+  // 其餘延遲載入
+  setTimeout(() => {
+    if (S.pref.scan)   loadScanByMode('主力異動');
+    if (S.pref.big)    loadBigTab('台灣指數');
+  }, 500);
+
+  // 自動刷新（開市中每30秒）
+  setInterval(autoRefresh, 30000);
 });
 
 function hideLoading() {
@@ -1274,8 +1283,9 @@ async function loadKline() {
 }
 
 function setKlineTimeframe(el, tf) {
+  console.log('Set Kline Timeframe:', tf);
   S.klineTimeframe = tf;
-  document.querySelectorAll('#klineTimeframes .btn-xs').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#klineTimeframes .kline-tab').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
   loadKline();
 }
